@@ -2,11 +2,17 @@ include <../../lib/screwpost.scad>
 include <../../lib/switch.scad>
 include <../../lib/dsacaps.scad>
 
+// 2mm is the smallest recommended value.  Higher values may be used for aesthetic reasons.
+wall_thickness = 2;
+
 /* [Hidden] */
 
 bottom_thickness = 1;
 
 rfeet = 10;
+
+// Extra clearance between keycaps and walls
+keycap_clearance = 0.5;
 
 // Clearance for processor and handwiring
 promicroclearance = 4;
@@ -15,7 +21,7 @@ shellh = 9 - plate_thickness + promicroclearance;
 $fn = 24;
 //$fn = 72;
 
-wall_thickness = 2;
+wt = wall_thickness + keycap_clearance;
 
 rscrew = 1.5;
 rtop   = 3;
@@ -52,7 +58,7 @@ feetpos = [
 
 module plate()
 {
-	r = rtop + wall_thickness;
+	r = rtop + wt;
 	difference()
 	{
 		// Base pieces
@@ -62,7 +68,8 @@ module plate()
 		for(x = [0:len(cols) - 1])
 		{
 			for(y = [0:cols[x][1] - 1]) translate([key_space * x, (key_space * y) + cols[x][0]]) switch();
-			translate([key_space * x, cols[x][0], plate_thickness]) cube([key_space, key_space * cols[x][1], wallh]);
+			translate([(key_space * x) - (keycap_clearance / 2), cols[x][0] - (keycap_clearance / 2), plate_thickness])
+				cube([key_space + keycap_clearance, key_space * cols[x][1] + keycap_clearance, wallh]);
 		}
 
 		// Screw holes
@@ -76,7 +83,7 @@ module plate()
 
 module shell()
 {
-	r = rtop + wall_thickness;
+	r = rtop + wt;
 
 	rjack = 3;
 
@@ -89,13 +96,13 @@ module shell()
 		{
 			// Main shell
 			translate([0, 0, -bottom_thickness]) newershell(shellh + bottom_thickness, r);
-			newershell(shellh, r - wall_thickness);
+			newershell(shellh, r - wt);
 
 			// TRRS jack hole
 			translate([key_space * 4 + pos, key_space * 4 + (sqrt(((key_space * 3 + rtop) * (key_space * 3 + rtop)) - (pos * pos)) * ((key_space + cols[tallestcol][0]) / ((key_space * 3) + rtop)))])
 			{
-				translate([rjack * 2, 0, 3 + 1]) rotate([-90, 0]) cylinder(wall_thickness, rjack, rjack);
-				translate([rjack * 2, 1, 3 + 1]) rotate([-90, 0]) cylinder(wall_thickness, 2 * rjack, 2 * rjack);
+				translate([rjack * 2, 0, 3 + 1]) rotate([-90, 0]) cylinder(wt, rjack, rjack);
+				translate([rjack * 2, 1, 3 + 1]) rotate([-90, 0]) cylinder(wt, 2 * rjack, 2 * rjack);
 				rotate(-90) cube(4 * rjack);
 			}
 
@@ -109,8 +116,8 @@ module shell()
 
 			// Micro USB-port
 			translate([key_space * len(cols) / 2,
-					   (key_space * cols[tallestcol][1]) + cols[tallestcol][0] + (wall_thickness / 2), 2.75])
-				cube([8, wall_thickness, 4], center=true);
+					   (key_space * cols[tallestcol][1]) + cols[tallestcol][0] + (wt / 2), 2.75])
+				cube([8, wt, 4], center=true);
 		}
 
 		// Pro micro holder
@@ -159,4 +166,4 @@ color("#74b")
 }
 
 // Show keycaps in preview mode
-dsacaps();
+%dsacaps();
