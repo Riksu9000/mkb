@@ -1,4 +1,4 @@
-/* This module accepts global variables and function parameters */
+// This module accepts global variables and function parameters
 module screwpost(h = shellh, rtop = rtop, rscrew = rscrew)
 {
 	difference()
@@ -10,5 +10,11 @@ module screwpost(h = shellh, rtop = rtop, rscrew = rscrew)
 		}
 		cylinder(h, rscrew, rscrew);
 	}
+}
+
+// This can be used to hollow out the post if necessary
+module screwhole(h = shellh, rscrew = rscrew)
+{
+	cylinder(h, rscrew, rscrew);
 }
 
