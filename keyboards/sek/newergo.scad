@@ -106,9 +106,8 @@ module shell()
 				rotate(-90) cube(4 * rjack);
 			}
 
-			// Carve authors name on bottom :)
 			translate([key_space * (len(cols) / 2), ((key_space * cols[tallestcol][1]) + cols[tallestcol][0]) / 2, -0.2])
-				linear_extrude(0.2) text("Riku Isokoski 2019", halign="center", valign="center");
+				linear_extrude(0.2) text("https://github.com/Riksu9000/mkb", halign="center", valign="center", size=6);
 
 			// Feet on bottom
 			for(i = [0 :len(feetpos) - 1]) translate(feetpos[i])
