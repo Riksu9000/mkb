@@ -56,6 +56,10 @@ feetpos = [
 	[key_space * (len(cols) - 0.5), key_space * 0.5 + cols[len(cols) - 1][0]],
 ];
 
+// These functions find a point on the inner curve given the offset from the beginning of the curve
+function curvey(pos) = key_space * 4 + (sqrt(((key_space * 3 + rtop) * (key_space * 3 + rtop)) - (pos * pos)) * ((key_space + cols[tallestcol][0]) / ((key_space * 3) + rtop)));
+function curvex(pos) = key_space * 4 + pos;
+
 module plate()
 {
 	r = rtop + wt;
@@ -99,7 +103,7 @@ module shell()
 			newershell(shellh, r - wt);
 
 			// TRRS jack hole
-			translate([key_space * 4 + pos, key_space * 4 + (sqrt(((key_space * 3 + rtop) * (key_space * 3 + rtop)) - (pos * pos)) * ((key_space + cols[tallestcol][0]) / ((key_space * 3) + rtop)))])
+			translate([curvex(pos), curvey(pos)])
 			{
 				translate([rjack * 2, 0, 3 + 1]) rotate([-90, 0]) cylinder(wt, rjack, rjack);
 				translate([rjack * 2, 1, 3 + 1]) rotate([-90, 0]) cylinder(wt, 2 * rjack, 2 * rjack);
