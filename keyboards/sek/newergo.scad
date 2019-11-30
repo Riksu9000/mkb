@@ -50,10 +50,10 @@ screwpos = [
 ];
 
 feetpos = [
-	[key_space * 0.5, key_space * 0.5],
-	[key_space, (key_space * (cols[tallestcol][1] - 1.0)) + cols[tallestcol][0]],
-	[key_space * (len(cols) - 1), (key_space * (cols[tallestcol][1] - 1.0)) + cols[tallestcol][0]],
-	[key_space * (len(cols) - 0.5), key_space * 0.5 + cols[len(cols) - 1][0]],
+	[-rtop + rfeet, rfeet],
+	[key_space, curvey(2 * key_space) - rfeet],
+	[key_space * (len(cols) - 1), curvey(2 * key_space) - rfeet],
+	[key_space * len(cols) + rtop - rfeet, rfeet + cols[len(cols) - 1][0]],
 ];
 
 // These functions find a point on the inner curve given the offset from the beginning of the curve
