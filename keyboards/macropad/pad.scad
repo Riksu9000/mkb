@@ -31,7 +31,7 @@ module plate()
 {
 	difference()
 	{
-		shape(wallh);
+		shape(plate_thickness + wallh);
 		translate([0, 0, plate_thickness]) cube([key_space * width, key_space * height, wallh]);
 		for(x = [0:width - 1], y = [0:height - 1])
 			translate([key_space * x, key_space * y]) switch();
@@ -63,7 +63,7 @@ module shape(h, r = wall_thickness)
 	];
 
 	if(r == 0)
-		cube([key_space * width, key_space * height, plate_thickness + wallh]);
+		cube([key_space * width, key_space * height, plate_thickness + h]);
 	else
 		hull()
 			for(i = [0:len(shellshape) - 1])
