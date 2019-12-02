@@ -118,9 +118,11 @@ module shell()
 				translate([0, 0, -bottom_thickness]) cylinder(bottom_thickness, rfeet, rfeet);
 
 			// Micro USB-port
-			translate([key_space * len(cols) / 2,
-					   (key_space * cols[tallestcol][1]) + cols[tallestcol][0] + (wt / 2), 2.75])
+			translate([key_space * len(cols) / 2, (key_space * cols[tallestcol][1]) + cols[tallestcol][0] + (wt / 2), 2.75])
+			{
 				cube([8, wt, 4], center=true);
+				translate([0, 1]) cube([16, wt, 12], center=true);
+			}
 		}
 
 		// Pro micro holder
