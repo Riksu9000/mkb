@@ -2,8 +2,8 @@ include <../../lib/screwpost.scad>
 include <../../lib/switch.scad>
 include <../../lib/dsacaps.scad>
 
-// 2mm is the smallest recommended value.  Higher values may be used for aesthetic reasons.
-wall_thickness = 2;
+// Larger values can be used for aesthetic reasons.
+wall_thickness = 1.5;
 
 /* [Hidden] */
 
@@ -21,7 +21,8 @@ shellh = 9 - plate_thickness + promicroclearance;
 $fn = 24;
 //$fn = 72;
 
-wt = wall_thickness + keycap_clearance;
+// Thickness of shell is wt, while minimum thickness of walls around switches are wall_thickness
+wt = max(2, wall_thickness + keycap_clearance);
 
 rscrew = 1.5;
 rtop   = 3;
