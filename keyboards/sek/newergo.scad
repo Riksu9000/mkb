@@ -3,7 +3,7 @@ include <../../lib/switch.scad>
 include <../../lib/dsacaps.scad>
 
 // Larger values can be used for aesthetic reasons.
-wall_thickness = 1.5;
+wall_thickness = 1.75;
 
 /* [Hidden] */
 
