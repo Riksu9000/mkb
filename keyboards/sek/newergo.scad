@@ -12,7 +12,7 @@ bottom_thickness = 1;
 rfeet = 10;
 
 // Extra clearance between keycaps and walls
-keycap_clearance = 0.5;
+keycap_clearance = 0.25;
 
 // Clearance for processor and handwiring
 promicroclearance = 4;
@@ -73,8 +73,8 @@ module plate()
 		for(x = [0:len(cols) - 1])
 		{
 			for(y = [0:cols[x][1] - 1]) translate([key_space * x, (key_space * y) + cols[x][0]]) switch();
-			translate([(key_space * x) - (keycap_clearance / 2), cols[x][0] - (keycap_clearance / 2), plate_thickness])
-				cube([key_space + keycap_clearance, key_space * cols[x][1] + keycap_clearance, wallh]);
+			translate([(key_space * x) - keycap_clearance, cols[x][0] - keycap_clearance, plate_thickness])
+				cube([key_space + (keycap_clearance * 2), key_space * cols[x][1] + (keycap_clearance * 2), wallh]);
 		}
 
 		// Screw holes
