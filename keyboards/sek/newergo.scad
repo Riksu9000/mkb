@@ -96,10 +96,8 @@ module shell()
 {
 	r = rtop + wt;
 
-	rjack = 3;
-
 	// Position of TRRS jack from beginning of curve
-	pos = key_space - (rjack * 2);
+	pos = key_space * 1.5;
 
 	union()
 	{
@@ -110,12 +108,8 @@ module shell()
 			newershell(shellh, r - wt);
 
 			// TRRS jack hole
-			translate([curvex(pos), curvey(pos) - wt])
-			{
-				translate([rjack * 2, 0, 3 + 1]) rotate([-90, 0]) cylinder(wt, rjack, rjack);
-				translate([rjack * 2, 1, 3 + 1]) rotate([-90, 0]) cylinder(wt, 2 * rjack, 2 * rjack);
-				rotate(-90) cube(4 * rjack);
-			}
+			translate([curvex(pos), curvey(pos), 4.5]) rotate([90, 0]) cylinder(wt * 2, 4, 4);
+			translate([curvex(pos), curvey(pos - 5.5) - wt + 1, 4.5]) rotate([-90, 0]) cylinder(wt, 5.5, 5.5);
 
 			translate([center, ((key_space * cols[tallestcol][1]) + cols[tallestcol][0]) / 2, -0.2])
 				linear_extrude(0.2) text("https://github.com/Riksu9000/mkb", halign="center", valign="center", size=6);
@@ -125,15 +119,13 @@ module shell()
 				translate([0, 0, -bottom_thickness]) cylinder(bottom_thickness, rfeet, rfeet);
 
 			// Micro USB-port
-			translate([center, (key_space * cols[tallestcol][1]) + cols[tallestcol][0] + (wt / 2), 2.75])
-			{
-				cube([8, wt, 4], center=true);
-				translate([0, 1]) cube([16, wt, 12], center=true);
-			}
+			translate([curvex(-4), curvey(0), 0.75]) rotate(-90) cube([wt * 2, 8, 4]);
+			translate([curvex(-9.5), curvey(0) - wt]) rotate(-90) cube([34, 19, 4.75]);
+			translate([curvex(-8), curvey(0) - wt + 1, -4 + 0.75]) cube([16, wt, 12]);
 		}
 
 		// Pro micro holder
-		translate([center - 11.5, (key_space * cols[tallestcol][1]) + cols[tallestcol][0] - 34])
+		translate([curvex(-11.5), curvey(-11.5) - 34 - (wt / 2)])
 		{
 			cube([2, 34, 1]);
 			translate([2 + 19, 0]) cube([2, 34, 1]);
