@@ -45,7 +45,7 @@ tallestcol = 3; // Automate this someday
 center = (len(cols) / 2) * key_space;
 rad = center + rtop + wt;
 sc = (((cols[tallestcol][1] - 4) * key_space) + cols[tallestcol][0] + wt) / rad;
-hi = rad * (1 - cos(asin((key_space / 2) / rad)));
+height_diff = rad * (1 - cos(asin((key_space / 2) / rad)));
 
 screwpos = [
 	[0, key_space],
@@ -64,7 +64,7 @@ feetpos = [
 // These functions find a point on the outer curve given the offset from the center
 function curvey(pos) = key_space * 4
                       + sqrt((rad * rad) - (pos * pos)) * sc
-                      + hi * sc;
+                      + height_diff * sc;
 function curvex(pos) = center + pos;
 
 module plate()
@@ -117,7 +117,7 @@ module shell()
 				rotate(-90) cube(4 * rjack);
 			}
 
-			translate([key_space * (len(cols) / 2), ((key_space * cols[tallestcol][1]) + cols[tallestcol][0]) / 2, -0.2])
+			translate([center, ((key_space * cols[tallestcol][1]) + cols[tallestcol][0]) / 2, -0.2])
 				linear_extrude(0.2) text("https://github.com/Riksu9000/mkb", halign="center", valign="center", size=6);
 
 			// Feet on bottom
@@ -125,7 +125,7 @@ module shell()
 				translate([0, 0, -bottom_thickness]) cylinder(bottom_thickness, rfeet, rfeet);
 
 			// Micro USB-port
-			translate([key_space * len(cols) / 2, (key_space * cols[tallestcol][1]) + cols[tallestcol][0] + (wt / 2), 2.75])
+			translate([center, (key_space * cols[tallestcol][1]) + cols[tallestcol][0] + (wt / 2), 2.75])
 			{
 				cube([8, wt, 4], center=true);
 				translate([0, 1]) cube([16, wt, 12], center=true);
@@ -133,7 +133,7 @@ module shell()
 		}
 
 		// Pro micro holder
-		translate([((key_space * len(cols)) / 2) - 11.5, (key_space * cols[tallestcol][1]) + cols[tallestcol][0] - 34])
+		translate([center - 11.5, (key_space * cols[tallestcol][1]) + cols[tallestcol][0] - 34])
 		{
 			cube([2, 34, 1]);
 			translate([2 + 19, 0]) cube([2, 34, 1]);
@@ -151,7 +151,7 @@ module shell()
 
 module newershell(h, r)
 {
-	hi = (center + r) * (1 - cos(asin((key_space / 2) / (center + r))));
+	height_diff = (center + r) * (1 - cos(asin((key_space / 2) / (center + r))));
 	sc = (((cols[tallestcol][1] - 4) * key_space) + cols[tallestcol][0] + r - rtop) / (center + r);
 
 	shellshape = [
@@ -165,7 +165,7 @@ module newershell(h, r)
 	hull()
 	{
 		for(i = [0:len(shellshape) - 1]) translate(shellshape[i]) cylinder(h, r, r);
-		translate([center, (key_space * 4) + (hi * sc)]) scale([1, sc]) cylinder(h, center + r, center + r, $fn = $fn * 4);
+		translate([center, (key_space * 4) + (height_diff * sc)]) scale([1, sc]) cylinder(h, center + r, center + r, $fn = $fn * 4);
 	}
 }
 
