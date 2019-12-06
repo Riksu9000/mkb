@@ -5,6 +5,9 @@ include <../../lib/dsacaps.scad>
 // Larger values can be used for aesthetic reasons.
 wall_thickness = 1.75;
 
+// Different methods of making space inside the shell.
+internal_space = 0; // [0:By perimeter, 1:By key position]
+
 $fn = 24; // [8:8.Draft, 24:24.Proto, 72:72.Export]
 
 /* [Hidden] */
@@ -105,10 +108,22 @@ module shell()
 		{
 			// Main shell
 			translate([0, 0, -bottom_thickness]) newershell(shellh + bottom_thickness, r);
-			newershell(shellh, r - wt);
+
+			if(internal_space == 0)
+				newershell(shellh, r - wt);
+			else if(internal_space == 1)
+			{
+				hull()
+					for(x = [0:len(cols) - 1])
+						translate([key_space * x, cols[x][0]])
+							cube([key_space, key_space * cols[x][1], shellh]);
+				for(i = [0:len(screwpos) - 1]) translate(screwpos[i])
+					screwhole();
+			}
+
 
 			// TRRS jack hole
-			translate([curvex(pos), curvey(pos), 4.5]) rotate([90, 0]) cylinder(wt * 2, 4, 4);
+			translate([curvex(pos), curvey(pos), 4.5]) rotate([90, 0]) cylinder(wt * 3, 4, 4);
 			translate([curvex(pos), curvey(pos - 5.5) - wt + 1, 4.5]) rotate([-90, 0]) cylinder(wt, 5.5, 5.5);
 
 			translate([center, ((key_space * cols[tallestcol][1]) + cols[tallestcol][0]) / 2, -0.2])
