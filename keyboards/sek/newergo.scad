@@ -5,6 +5,8 @@ include <../../lib/dsacaps.scad>
 // Larger values can be used for aesthetic reasons.
 wall_thickness = 1.75;
 
+$fn = 24; // [8:8.Draft, 24:24.Proto, 72:72.Export]
+
 /* [Hidden] */
 
 bottom_thickness = 1;
@@ -17,9 +19,6 @@ keycap_clearance = 0.25;
 // Clearance for processor and handwiring
 promicroclearance = 4;
 shellh = 9 - plate_thickness + promicroclearance;
-
-$fn = 24;
-//$fn = 72;
 
 // Thickness of shell is wt, while minimum thickness of walls around switches are wall_thickness
 wt = max(2, wall_thickness + keycap_clearance);
@@ -43,6 +42,11 @@ cols = [
 ];
 tallestcol = 3; // Automate this someday
 
+center = (len(cols) / 2) * key_space;
+rad = center + rtop + wt;
+sc = (((cols[tallestcol][1] - 4) * key_space) + cols[tallestcol][0] + wt) / rad;
+hi = rad * (1 - cos(asin((key_space / 2) / rad)));
+
 screwpos = [
 	[0, key_space],
 	[key_space, key_space * cols[0][1]],
@@ -52,14 +56,16 @@ screwpos = [
 
 feetpos = [
 	[-rtop + rfeet, rfeet],
-	[key_space, curvey(2 * key_space) - rfeet],
-	[key_space * (len(cols) - 1), curvey(2 * key_space) - rfeet],
+	[key_space, curvey(2.5 * key_space) - rfeet - wt],
+	[key_space * (len(cols) - 1), curvey(2.5 * key_space) - rfeet - wt],
 	[key_space * len(cols) + rtop - rfeet, rfeet + cols[len(cols) - 1][0]],
 ];
 
-// These functions find a point on the inner curve given the offset from the beginning of the curve
-function curvey(pos) = key_space * 4 + (sqrt(((key_space * 3 + rtop) * (key_space * 3 + rtop)) - (pos * pos)) * ((key_space + cols[tallestcol][0]) / ((key_space * 3) + rtop)));
-function curvex(pos) = key_space * 4 + pos;
+// These functions find a point on the outer curve given the offset from the center
+function curvey(pos) = key_space * 4
+                      + sqrt((rad * rad) - (pos * pos)) * sc
+                      + hi * sc;
+function curvex(pos) = center + pos;
 
 module plate()
 {
@@ -93,7 +99,7 @@ module shell()
 	rjack = 3;
 
 	// Position of TRRS jack from beginning of curve
-	pos = (key_space * .5) - (rjack * 2);
+	pos = key_space - (rjack * 2);
 
 	union()
 	{
@@ -104,7 +110,7 @@ module shell()
 			newershell(shellh, r - wt);
 
 			// TRRS jack hole
-			translate([curvex(pos), curvey(pos)])
+			translate([curvex(pos), curvey(pos) - wt])
 			{
 				translate([rjack * 2, 0, 3 + 1]) rotate([-90, 0]) cylinder(wt, rjack, rjack);
 				translate([rjack * 2, 1, 3 + 1]) rotate([-90, 0]) cylinder(wt, 2 * rjack, 2 * rjack);
@@ -145,7 +151,8 @@ module shell()
 
 module newershell(h, r)
 {
-	sc = (((cols[tallestcol][1] - 4) * key_space) + cols[tallestcol][0] + r - rtop) / ((key_space * 3) + r);
+	hi = (center + r) * (1 - cos(asin((key_space / 2) / (center + r))));
+	sc = (((cols[tallestcol][1] - 4) * key_space) + cols[tallestcol][0] + r - rtop) / (center + r);
 
 	shellshape = [
 		[0, rtop],
@@ -158,12 +165,16 @@ module newershell(h, r)
 	hull()
 	{
 		for(i = [0:len(shellshape) - 1]) translate(shellshape[i]) cylinder(h, r, r);
-		translate([key_space * 3, key_space * 4]) scale([1, sc]) cylinder(h, (key_space * 3) + r, (key_space * 3) + r, $fn = $fn * 5);
-		translate([key_space * 4, key_space * 4]) scale([1, sc]) cylinder(h, (key_space * 3) + r, (key_space * 3) + r, $fn = $fn * 5);
+		translate([center, (key_space * 4) + (hi * sc)]) scale([1, sc]) cylinder(h, center + r, center + r, $fn = $fn * 4);
 	}
 }
 
 // Renders
+
+// testing curve functions
+//for(i = [0:center])
+//	translate([curvex2(i), curvey2(i)])
+//		cylinder(10, 1, 1);
 
 color("#74b")
 {
