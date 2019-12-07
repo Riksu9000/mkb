@@ -51,14 +51,14 @@ sc = (((cols[tallestcol][1] - 4) * key_space) + cols[tallestcol][0] + wt) / rad;
 height_diff = rad * (1 - cos(asin((key_space / 2) / rad)));
 
 screwpos = [
-	[0, key_space],
-	[key_space, key_space * cols[0][1]],
+	[0, key_space + cols[0][0]],
+	[key_space, (key_space * cols[0][1]) + cols[0][0]],
 	[key_space * (len(cols) - 1), key_space * cols[len(cols) - 1][1]],
 	[key_space * len(cols), key_space + cols[len(cols) - 1][0]],
 ];
 
 feetpos = [
-	[-rtop + rfeet, rfeet],
+	[-rtop + rfeet, rfeet + cols[0][0]],
 	[key_space, curvey(2.5 * key_space) - rfeet - wt],
 	[key_space * (len(cols) - 1), curvey(2.5 * key_space) - rfeet - wt],
 	[key_space * len(cols) + rtop - rfeet, rfeet + cols[len(cols) - 1][0]],
@@ -162,7 +162,7 @@ module newershell(h, r)
 	sc = (((cols[tallestcol][1] - 4) * key_space) + cols[tallestcol][0] + r - rtop) / (center + r);
 
 	shellshape = [
-		[0, rtop],
+		[0, rtop + cols[0][0]],
 		[0, key_space * 4],
 		[key_space * len(cols), cols[len(cols) - 1][0] + rtop],
 		[key_space * (len(cols) - 1), cols[len(cols) - 1][0] + rtop],
