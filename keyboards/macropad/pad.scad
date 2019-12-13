@@ -55,8 +55,16 @@ module shell()
 	{
 		translate([0, 0, -bottom_thickness]) shape(shellh + bottom_thickness);
 		shape(shellh, 0);
-		//cube([key_space * width, key_space * height, shellh]);
+
+		// Micro USB-port
+		translate([((width / 2) * key_space) - 4, height * key_space, 0.75]) cube([8, wt, 4]);
+		translate([((width / 2) * key_space) - 8, (height * key_space) + 1, 0.75 - 4]) cube([16, wt, 12]);
 	}
+
+	// Pro micro holder
+	translate([((width / 2) * key_space) - 11.5, (height * key_space) - 34]) cube([2, 34, 1]);
+	translate([((width / 2) * key_space) + 9.5, (height * key_space) - 34]) cube([2, 34, 1]);
+
 	for(i = [0:len(screwpos) - 1]) translate(screwpos[i])
 		screwpost();
 }
