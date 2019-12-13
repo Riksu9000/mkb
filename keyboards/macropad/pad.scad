@@ -7,11 +7,18 @@ wall_thickness = 2;
 
 /* [Hidden] */
 
-$fn = 24;
-//$fn = 72;
+$fn = 24; // [8:8.Draft, 24:24.Proto, 72:72.Export]
+
+/* [Hidden] */
 
 bottom_thickness = 1;
 wallh = 7;
+
+// Extra clearance between keycaps and walls
+keycap_clearance = 0.25;
+
+// Thickness of shell is wt, while minimum thickness of walls around switches are wall_thickness
+wt = max(2, wall_thickness + keycap_clearance);
 
 rscrew = 1.5;
 rtop   = 3;
@@ -32,7 +39,8 @@ module plate()
 	difference()
 	{
 		shape(plate_thickness + wallh);
-		translate([0, 0, plate_thickness]) cube([key_space * width, key_space * height, wallh]);
+		translate([-keycap_clearance, -keycap_clearance, plate_thickness]) cube([(key_space * width) + (keycap_clearance * 2), (key_space * height) + (keycap_clearance * 2), wallh]);
+
 		for(x = [0:width - 1], y = [0:height - 1])
 			translate([key_space * x, key_space * y]) switch();
 	
@@ -53,7 +61,7 @@ module shell()
 		screwpost();
 }
 
-module shape(h, r = wall_thickness)
+module shape(h, r = wt)
 {
 	shellshape = [
 		[0, 0],
