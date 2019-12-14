@@ -66,10 +66,10 @@ module plate()
 
 		if(deckmode)
 		{
-			translate([-wt, key_space * 0.5]) rotate([0, 90]) cylinder(3, r_axle, r_axle);
-			translate([(width * key_space) + wt, key_space * 0.5]) rotate([0, -90]) cylinder(3, r_axle, r_axle);
-			translate([-wt, (height - 0.5) * key_space]) rotate([0, 90]) cylinder(3, r_axle, r_axle);
-			translate([(width * key_space) + wt, (height - 0.5) * key_space]) rotate([0, -90]) cylinder(3, r_axle, r_axle);
+			translate([-wt, key_space * 0.5]) rotate(-90) tear(3, r_axle);
+			translate([-wt, (height - 0.5) * key_space]) rotate(-90) tear(3, r_axle);
+			translate([(width * key_space) + wt, key_space * 0.5]) rotate(90) tear(3, r_axle);
+			translate([(width * key_space) + wt, (height - 0.5) * key_space]) rotate(90) tear(3, r_axle);
 		}
 	}
 }
@@ -105,21 +105,32 @@ module shell()
 
 module stand()
 {
-
 	dist = key_space * (height - 1);
 	thickness = 3;
 	r = r_axle - 0.3;
 	height = sqrt((shellh + bottom_thickness) * (shellh + bottom_thickness) + ((key_space / 2) + wt) * ((key_space / 2) + wt)) + 1;
 
-	module peg(h = thickness, r = r) rotate([0, 90]) cylinder(h, r, r);
+	module peg(h = thickness, r = r)
+	{
+		intersection()
+		{
+			rotate([0, 90]) cylinder(h, r, r);
+			hull()
+			{
+				rotate([0, -90]) cylinder(1, r, r);
+				translate([h, 0, h]) rotate([0, 90]) cylinder(1, r, r);
+			}
+
+		}
+	}
 
 	module plate()
 	{
 		hull()
 		{
-			peg();
-			translate([0, dist]) peg();
-			rotate([angle, 0]) translate([0, dist]) peg();
+			rotate([0, 90]) cylinder(thickness, r, r);
+			translate([0, dist]) rotate([0, 90]) cylinder(thickness, r, r);
+			rotate([angle, 0]) translate([0, dist]) rotate([0, 90]) cylinder(thickness, r, r);
 			translate([0, dist + height, - height + r]) rotate([90, 180 / 8, 90]) cylinder_outer(thickness, r, 8);
 			translate([0, -height, -height + r]) rotate([90, 180 / 8, 90]) cylinder_outer(thickness, r, 8);
 		}
@@ -129,21 +140,20 @@ module stand()
 	translate([-wt, key_space * 0.5, shellh])
 	{
 		peg();
-		rotate([angle, 0]) translate([0, dist]) peg();
+		rotate([angle, 0]) translate([0, dist]) rotate([-angle, 0]) peg();
 		translate([-thickness, 0]) plate();
 	}
 
 	// Right holder
-	translate([(width * key_space) + wt - thickness, key_space * 0.5, shellh])
+	translate([(width * key_space) + wt, key_space * 0.5, shellh])
 	{
-		peg();
-		rotate([angle, 0]) translate([0, dist]) peg();
-		translate([thickness, 0]) plate();
+		rotate(180) peg();
+		rotate([angle, 0]) translate([0, dist]) rotate([angle, 0, 180]) peg();
+		plate();
 	}
 
 	translate([-wt, (key_space * 0.5) + dist + height, -height + shellh + r]) rotate([90, 180 / 8, 90]) cylinder_outer((width * key_space) + (2 * wt), r, 8);
 	translate([-wt, (key_space * 0.5) - height, -height + shellh + r]) rotate([90, 180 / 8, 90]) cylinder_outer((width * key_space) + (2 * wt), r, 8);
-
 }
 
 module shape(h, r = wt)
@@ -170,3 +180,7 @@ translate([0, key_space * 0.5, shellh]) rotate([angle, 0]) translate([0, -key_sp
 	shell();
 }
 if(deckmode) stand();
+
+//stand();
+//plate();
+//shell();
