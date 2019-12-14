@@ -3,6 +3,7 @@ include <../../lib/screwpost.scad>
 
 deckmode = 0;  // [0:Disabled, 1:Enabled]
 
+// Only in deckmode
 holder_angle = 30;
 
 angle = deckmode ? holder_angle : 0;
@@ -10,7 +11,8 @@ angle = deckmode ? holder_angle : 0;
 width = 5;
 height = 3;
 
-wall_thickness = deckmode ? 5 : 2;
+// Larger values can be used for aesthetic reasons
+wall_thickness = 1.75;
 
 $fn = 24; // [8:8.Draft, 24:24.Proto, 72:72.Export]
 
@@ -23,7 +25,7 @@ wallh = 7;
 keycap_clearance = 0.25;
 
 // Thickness of shell is wt, while minimum thickness of walls around switches are wall_thickness
-wt = max(2, wall_thickness + keycap_clearance);
+wt = max((deckmode ? 5 : 1.75) + keycap_clearance, wall_thickness + keycap_clearance);
 
 rscrew = 1.5;
 rtop   = 3;
@@ -41,15 +43,20 @@ screwpos = [
 	[(width - 1) * key_space, key_space],
 ];
 
+// For deckmode
+pegpos = [
+	[-wt, key_space * 0.5],
+	[-wt, (height - 0.5) * key_space],
+	[(width * key_space) + 1.75, key_space * 0.5],
+	[(width * key_space) + 1.75, (height - 0.5) * key_space],
+];
+
+
 module tear(h, r)
 {
 	rotate([-90, 0]) cylinder(h, r, r);
 	rotate([0, -45]) cube([r, h, r]);
 }
-
-module cylinder_outer(height,radius,fn){
-   fudge = 1/cos(180/fn);
-   cylinder(h=height,r=radius*fudge,$fn=fn);}
 
 module plate()
 {
@@ -65,39 +72,37 @@ module plate()
 			cylinder(plate_thickness, rscrew, rscrew);
 
 		if(deckmode)
-		{
-			translate([-wt, key_space * 0.5]) rotate(-90) tear(3, r_axle);
-			translate([-wt, (height - 0.5) * key_space]) rotate(-90) tear(3, r_axle);
-			translate([(width * key_space) + wt, key_space * 0.5]) rotate(90) tear(3, r_axle);
-			translate([(width * key_space) + wt, (height - 0.5) * key_space]) rotate(90) tear(3, r_axle);
-		}
+			for(i = [0:len(pegpos) - 1])
+				translate(pegpos[i])
+					rotate(-90)
+						tear(wt - 1.75, r_axle);
 	}
 }
 
 
 module shell()
 {
+	center = (width / 2) * key_space;
 	difference()
 	{
 		translate([0, 0, -bottom_thickness]) shape(shellh + bottom_thickness);
-		shape(shellh, 0);
+		cube([key_space * width, key_space * height, shellh]);
 
 		if(deckmode)
-		{
-			translate([-wt, key_space * 0.5, shellh]) rotate([0, 90]) cylinder(3, r_axle, r_axle);
-			translate([(width * key_space) + wt, key_space * 0.5, shellh]) rotate([0, -90]) cylinder(3, r_axle, r_axle);
-			translate([-wt, (height - 0.5) * key_space, shellh]) rotate([0, 90]) cylinder(3, r_axle, r_axle);
-			translate([(width * key_space) + wt, (height - 0.5) * key_space, shellh]) rotate([0, -90]) cylinder(3, r_axle, r_axle);
-		}
+			translate([0, 0, shellh])
+				for(i = [0:len(pegpos) - 1])
+					translate(pegpos[i])
+						rotate([0, 90])
+							cylinder(wt - 1.75, r_axle, r_axle);
 
 		// Micro USB-port
-		translate([((width / 2) * key_space) - 4, height * key_space, 0.75]) cube([8, wt, 4]);
-		translate([((width / 2) * key_space) - 8, (height * key_space) + 1, 0.75 - 4]) cube([16, wt, 12]);
+		translate([center - 4, height * key_space, 0.75]) cube([8, wt, 4]);
+		translate([center - 8, (height * key_space) + 1, 0.75 - 4]) cube([16, wt, 12]);
 	}
 
 	// Pro micro holder
-	translate([((width / 2) * key_space) - 11.5, (height * key_space) - 34]) cube([2, 34, 1]);
-	translate([((width / 2) * key_space) + 9.5, (height * key_space) - 34]) cube([2, 34, 1]);
+	translate([center - 11.5, (height * key_space) - 34]) cube([2, 34, 1]);
+	translate([center + 9.5, (height * key_space) - 34]) cube([2, 34, 1]);
 
 	for(i = [0:len(screwpos) - 1]) translate(screwpos[i])
 		screwpost();
@@ -110,6 +115,11 @@ module stand()
 	r = r_axle - 0.3;
 	height = sqrt((shellh + bottom_thickness) * (shellh + bottom_thickness) + ((key_space / 2) + wt) * ((key_space / 2) + wt)) + 1;
 
+	//https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/undersized_circular_objects
+	module cylinder_outer(height,radius,fn){
+	   fudge = 1/cos(180/fn);
+	   cylinder(h=height,r=radius*fudge,$fn=fn);}
+
 	module peg(h = thickness, r = r)
 	{
 		intersection()
@@ -120,7 +130,6 @@ module stand()
 				rotate([0, -90]) cylinder(1, r, r);
 				translate([h, 0, h]) rotate([0, 90]) cylinder(1, r, r);
 			}
-
 		}
 	}
 
@@ -152,6 +161,7 @@ module stand()
 		plate();
 	}
 
+	// Connecting rods
 	translate([-wt, (key_space * 0.5) + dist + height, -height + shellh + r]) rotate([90, 180 / 8, 90]) cylinder_outer((width * key_space) + (2 * wt), r, 8);
 	translate([-wt, (key_space * 0.5) - height, -height + shellh + r]) rotate([90, 180 / 8, 90]) cylinder_outer((width * key_space) + (2 * wt), r, 8);
 }
@@ -165,13 +175,10 @@ module shape(h, r = wt)
 		[width * key_space, 0],
 	];
 
-	if(r == 0)
-		cube([key_space * width, key_space * height, plate_thickness + h]);
-	else
-		hull()
-			for(i = [0:len(shellshape) - 1])
-				translate(shellshape[i])
-					cylinder(h, r, r);
+	hull()
+		for(i = [0:len(shellshape) - 1])
+			translate(shellshape[i])
+				cylinder(h, r, r);
 }
 
 translate([0, key_space * 0.5, shellh]) rotate([angle, 0]) translate([0, -key_space * 0.5, -shellh])
@@ -182,5 +189,5 @@ translate([0, key_space * 0.5, shellh]) rotate([angle, 0]) translate([0, -key_sp
 if(deckmode) stand();
 
 //stand();
-//plate();
+//translate([0, 0, shellh]) plate();
 //shell();
