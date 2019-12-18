@@ -22,10 +22,10 @@ bottom_thickness = 1;
 wallh = 7;
 
 // Extra clearance between keycaps and walls
-keycap_clearance = 0.25;
+key_clearance = 0.25;
 
 // Thickness of shell is wt, while minimum thickness of walls around switches are wall_thickness
-wt = max((deckmode ? 5 : 1.75) + keycap_clearance, wall_thickness + keycap_clearance);
+wt = max((deckmode ? 5 : 1.75) + key_clearance, wall_thickness + key_clearance);
 
 rscrew = 1.5;
 rtop   = 3;
@@ -63,13 +63,14 @@ module plate()
 	difference()
 	{
 		shape(plate_thickness + wallh);
-		translate([-keycap_clearance, -keycap_clearance, plate_thickness]) cube([(key_space * width) + (keycap_clearance * 2), (key_space * height) + (keycap_clearance * 2), wallh]);
+		translate([-key_clearance, -key_clearance, plate_thickness])
+			cube([(key_space * width) + (key_clearance * 2), (key_space * height) + (key_clearance * 2), wallh + ($preview ? 1 : 0)]);
 
 		for(x = [0:width - 1], y = [0:height - 1])
-			translate([key_space * x, key_space * y]) switch();
+			translate([key_space * x, key_space * y, ($preview ? -.1 : 0)]) switch(plate_thickness + ($preview ? 1 : 0));
 	
 		for(i = [0:len(screwpos) - 1]) translate(screwpos[i])
-			cylinder(plate_thickness, rscrew, rscrew);
+			cylinder(plate_thickness + ($preview ? 1 : 0), rscrew, rscrew);
 
 		if(deckmode)
 			for(i = [0:len(pegpos) - 1])
@@ -86,7 +87,7 @@ module shell()
 	difference()
 	{
 		translate([0, 0, -bottom_thickness]) shape(shellh + bottom_thickness);
-		cube([key_space * width, key_space * height, shellh]);
+		cube([key_space * width, key_space * height, shellh + ($preview ? 1 : 0)]);
 
 		if(deckmode)
 			translate([0, 0, shellh])
