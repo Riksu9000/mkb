@@ -99,6 +99,10 @@ module shell()
 		// Micro USB-port
 		translate([center - 4, height * key_space, 0.75]) cube([8, wt, 4]);
 		translate([center - 8, (height * key_space) + 1, 0.75 - 4]) cube([16, wt, 12]);
+
+		translate([(width / 2) * key_space, 0, -0.2])
+			linear_extrude(0.2)
+				text("github.com/Riksu9000/mkb", halign="center", valign="bottom", size=min(width, 6));
 	}
 
 	// Pro micro holder
