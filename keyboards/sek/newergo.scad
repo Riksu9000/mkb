@@ -17,14 +17,14 @@ bottom_thickness = 1;
 rfeet = 10;
 
 // Extra clearance between keycaps and walls
-keycap_clearance = 0.25;
+key_clearance = 0.25;
 
 // Clearance for processor and handwiring
 promicroclearance = 4;
 shellh = 9 - plate_thickness + promicroclearance;
 
 // Thickness of shell is wt, while minimum thickness of walls around switches are wall_thickness
-wt = max(2, wall_thickness + keycap_clearance);
+wt = max(2, wall_thickness + key_clearance);
 
 rscrew = 1.5;
 rtop   = 3;
@@ -81,16 +81,19 @@ module plate()
 		// switch holes and space for caps
 		for(x = [0:len(cols) - 1])
 		{
-			for(y = [0:cols[x][1] - 1]) translate([key_space * x, (key_space * y) + cols[x][0]]) switch();
-			translate([(key_space * x) - keycap_clearance, cols[x][0] - keycap_clearance, plate_thickness])
-				cube([key_space + (keycap_clearance * 2), key_space * cols[x][1] + (keycap_clearance * 2), wallh]);
+			for(y = [0:cols[x][1] - 1])
+				translate([key_space * x, (key_space * y) + cols[x][0], $preview ? -0.1 : 0])
+					switch(plate_thickness + ($preview ? 1: 0));
+			translate([(key_space * x) - key_clearance, cols[x][0] - key_clearance, plate_thickness])
+				cube([key_space + (key_clearance * 2), key_space * cols[x][1] + (key_clearance * 2), wallh + ($preview ? 1: 0)]);
 		}
 
 		// Screw holes
 		for(i = [0:len(screwpos) - 1]) translate(screwpos[i])
 		{
-			cylinder(plate_thickness, rscrew, rscrew);
-			translate([0, 0, plate_thickness]) cylinder(wallh, rtop, rtop);
+			cylinder(plate_thickness + ($preview ? 1: 0), rscrew, rscrew);
+			translate([0, 0, plate_thickness])
+				cylinder(wallh + ($preview ? 1: 0), rtop, rtop);
 		}
 	}
 }
@@ -110,7 +113,7 @@ module shell()
 			translate([0, 0, -bottom_thickness]) newershell(shellh + bottom_thickness, r);
 
 			if(internal_space == 0)
-				newershell(shellh, r - wt);
+				newershell(shellh + ($preview ? 1: 0), r - wt);
 			else if(internal_space == 1)
 			{
 				hull()
@@ -131,7 +134,8 @@ module shell()
 
 			// Feet on bottom
 			for(i = [0 :len(feetpos) - 1]) translate(feetpos[i])
-				translate([0, 0, -bottom_thickness]) cylinder(bottom_thickness, rfeet, rfeet);
+				translate([0, 0, -bottom_thickness - ($preview ? 0.1 : 0)])
+					cylinder(bottom_thickness, rfeet, rfeet);
 
 			// Micro USB-port
 			translate([curvex(-4), curvey(0), 0.75]) rotate(-90) cube([wt * 2, 8, 4]);
