@@ -117,9 +117,15 @@ module stand()
 	height = sqrt((shellh + bottom_thickness) * (shellh + bottom_thickness) + ((key_space / 2) + wt) * ((key_space / 2) + wt)) + 1;
 
 	//https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/undersized_circular_objects
-	module cylinder_outer(height,radius,fn){
-	   fudge = 1/cos(180/fn);
-	   cylinder(h=height,r=radius*fudge,$fn=fn);}
+	module cylinder_outer(h, r, fn)
+	{
+		fudge = 1/cos(180/fn);
+		intersection()
+		{
+			translate([0, -r]) cube([h, r * 2, r]);
+			rotate([90, 180 / 8, 90]) cylinder(h,r=r*fudge,$fn=fn);
+		}
+	}
 
 	module peg(h = thickness, r = r)
 	{
@@ -141,8 +147,8 @@ module stand()
 			rotate([0, 90]) cylinder(thickness, r, r);
 			translate([0, dist]) rotate([0, 90]) cylinder(thickness, r, r);
 			rotate([angle, 0]) translate([0, dist]) rotate([0, 90]) cylinder(thickness, r, r);
-			translate([0, dist + height, - height + r]) rotate([90, 180 / 8, 90]) cylinder_outer(thickness, r, 8);
-			translate([0, -height, -height + r]) rotate([90, 180 / 8, 90]) cylinder_outer(thickness, r, 8);
+			translate([0, dist + height, - height]) cylinder_outer(thickness, r, 8);
+			translate([0, -height, -height]) cylinder_outer(thickness, r, 8);
 		}
 	}
 
@@ -163,8 +169,8 @@ module stand()
 	}
 
 	// Connecting rods
-	translate([-wt, (key_space * 0.5) + dist + height, -height + shellh + r]) rotate([90, 180 / 8, 90]) cylinder_outer((width * key_space) + (2 * wt), r, 8);
-	translate([-wt, (key_space * 0.5) - height, -height + shellh + r]) rotate([90, 180 / 8, 90]) cylinder_outer((width * key_space) + (2 * wt), r, 8);
+	translate([-wt, (key_space * 0.5) + dist + height, -height + shellh]) cylinder_outer((width * key_space) + (2 * wt), r, 8);
+	translate([-wt, (key_space * 0.5) - height, -height + shellh]) cylinder_outer((width * key_space) + (2 * wt), r, 8);
 }
 
 module shape(h, r = wt)
