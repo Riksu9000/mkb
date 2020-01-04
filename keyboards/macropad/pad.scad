@@ -8,8 +8,8 @@ holder_angle = 30;
 
 angle = deckmode ? holder_angle : 0;
 
-width = 5;
-height = 3;
+width = 5; // [3:20]
+height = 3; // [3:20]
 
 // Larger values can be used for aesthetic reasons
 wall_thickness = 1.75;
@@ -105,12 +105,21 @@ module shell()
 				text("github.com/Riksu9000/mkb", halign="center", valign="bottom", size=min(width, 6));
 	}
 
+	difference()
+	{
+		for(i = [0:len(screwpos) - 1])
+			translate(screwpos[i])
+				screwpost();
+		hull()
+		{
+			translate([center - 9.5, (height * key_space) - 34]) cube([19, 34, 1]);
+			translate([center - 9.5 + promicroclearance, (height * key_space) - 34, promicroclearance]) cube([19 - (promicroclearance * 2), 34, 1]);
+		}
+	}
+
 	// Pro micro holder
 	translate([center - 11.5, (height * key_space) - 34]) cube([2, 34, 1]);
 	translate([center + 9.5, (height * key_space) - 34]) cube([2, 34, 1]);
-
-	for(i = [0:len(screwpos) - 1]) translate(screwpos[i])
-		screwpost();
 }
 
 module stand()
