@@ -1,20 +1,30 @@
+/* These values can be changed inside the project if necessary */
 key_space = 19.05;
 plate_thickness = 3;
 
-module switch(h = plate_thickness)
+/* Shape options are "simple" and "complex".
+ * The "simple" shape might be easier to print at an angle, but otherwise "complex" is recommended */
+module switch(h = plate_thickness, shape = "complex", rotation = 0)
 {
-	side = 14;
-	tab_height = 1.5;
-	tab_depth = 1;
-	tab_width = 5;
-	translate([(key_space - side) / 2, (key_space - side) / 2]) union()
-	{
-		cube([side, side, h]);
-		translate([-0.8, 1]) cube([side + 1.6, 3.5, h]);
-		translate([-0.8, side - 1 - 3.5]) cube([side + 1.6, 3.5, h]);
-		translate([(side / 2) - (tab_width / 2), -tab_depth]) cube([tab_width, tab_depth, h - tab_height]);
-		translate([(side / 2) - (tab_width / 2), side]) cube([tab_width, tab_depth, h - tab_height]);
-	}
+	SIDE = 14;
+	TAB_HEIGHT = 1.5;
+	TAB_DEPTH = 1;
+	TAB_WIDTH = 5;
+	translate([key_space / 2, key_space / 2])
+		rotate(rotation)
+			translate([-key_space / 2, -key_space / 2])
+				translate([(key_space - SIDE) / 2, (key_space - SIDE) / 2])
+					union()
+					{
+						cube([SIDE, SIDE, h]);
+						if(shape == "complex")
+						{
+							translate([-0.8, 1])              cube([SIDE + 1.6, 3.5, h]);
+							translate([-0.8, SIDE - 1 - 3.5]) cube([SIDE + 1.6, 3.5, h]);
+						}
+						translate([(SIDE / 2) - (TAB_WIDTH / 2), -TAB_DEPTH]) cube([TAB_WIDTH, TAB_DEPTH, h - TAB_HEIGHT]);
+						translate([(SIDE / 2) - (TAB_WIDTH / 2), SIDE])       cube([TAB_WIDTH, TAB_DEPTH, h - TAB_HEIGHT]);
+					}
 }
 
 //switch();
