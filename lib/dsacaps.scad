@@ -20,12 +20,15 @@ module dsacaps(col = "#222", z = plate_thickness)
 				dsacap(unit = 1.0);
 }
 
-module dsacap(unit = 1.0)
+module dsacap(unit = 1.0, rotation = 0)
 {
-	hull()
-	{
-		translate([key_space / 2, key_space / 2]) rotate(45) cylinder(7.5, 18.25/sqrt(2), 12/sqrt(2), $fn = 4);
-		if(unit > 1.0) translate([(unit - 0.5) * key_space, key_space / 2]) rotate(45) cylinder(7.5, 18.25/sqrt(2), 12/sqrt(2), $fn = 4);
-	}
+	translate([key_space / 2, key_space / 2])
+		rotate(rotation)
+			translate([-((unit / 2) - 0.5) * key_space, 0])
+				hull()
+				{
+					rotate(45) cylinder(7.5, 18.25/sqrt(2), 12/sqrt(2), $fn = 4);
+					if(unit > 1.0) translate([(unit - 1) * key_space, 0]) rotate(45) cylinder(7.5, 18.25/sqrt(2), 12/sqrt(2), $fn = 4);
+				}
 }
 
