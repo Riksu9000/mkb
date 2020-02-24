@@ -97,11 +97,11 @@ module plate()
 			translate(thumbkeys[i])
 				switch(plate_thickness + ($preview ? 1: 0), rotation = thumbkeyrot[i]);
 		// Micro USB
-		translate([xpos - wt - 9.5 - 7, (key_space * cols[5][1]) + cols[5][0] + 1, 0.75 - 3 - shellh]) cube([14, wt, 10]);
+		translate([xpos - wt - 9.5 - 7, (key_space * cols[5][1]) + 1, 0.75 - 3 - shellh]) cube([14, wt, 10]);
 
 		// TRRS jack hole
-		translate([xpos - wt,     (key_space * cols[5][1]) + cols[5][0] - 34 - 5.5, 5.5 - shellh]) rotate([90, 0, 90]) cylinder(wt, 4, 4);
-		translate([xpos - wt + 1, (key_space * cols[5][1]) + cols[5][0] - 34 - 5.5, 5.5 - shellh]) rotate([90, 0, 90]) cylinder(wt, 5.5, 5.5);
+		translate([xpos - wt,     (key_space * cols[5][1]) - 34 - 5.5, 5.5 - shellh]) rotate([90, 0, 90]) cylinder(wt, 4, 4);
+		translate([xpos - wt + 1, (key_space * cols[5][1]) - 34 - 5.5, 5.5 - shellh]) rotate([90, 0, 90]) cylinder(wt, 5.5, 5.5);
 
 		// Screw holes
 		for(i = [0:len(screwpos) - 1]) translate(screwpos[i])
@@ -123,14 +123,14 @@ module shell()
 			translate([0, 0, bottom_thickness]) shape(shellh, 0, 1);
 
 			// Micro USB
-			translate([xpos - wt - 9.5 - 4, (key_space * cols[5][1]) + cols[5][0], bottom_thickness + 0.75]) cube([8, wt, 4]);
-			translate([xpos - wt - 9.5 - 7, (key_space * cols[5][1]) + cols[5][0] + 1, bottom_thickness + 0.75 - 3]) cube([14, wt, 10]);
+			translate([xpos - wt - 9.5 - 4, (key_space * cols[5][1]), bottom_thickness + 0.75]) cube([8, wt, 4]);
+			translate([xpos - wt - 9.5 - 7, (key_space * cols[5][1]) + 1, bottom_thickness + 0.75 - 3]) cube([14, wt, 10]);
 
 			// TRRS jack hole
-			translate([xpos - wt,     (key_space * cols[5][1]) + cols[5][0] - 34 - 5.5, 5.5 + bottom_thickness]) rotate([90, 0, 90]) cylinder(wt, 4, 4);
-			translate([xpos - wt + 1, (key_space * cols[5][1]) + cols[5][0] - 34 - 5.5, 5.5 + bottom_thickness]) rotate([90, 0, 90]) cylinder(wt, 5.5, 5.5);
+			translate([xpos - wt,     (key_space * cols[5][1]) - 34 - 5.5, 5.5 + bottom_thickness]) rotate([90, 0, 90]) cylinder(wt, 4, 4);
+			translate([xpos - wt + 1, (key_space * cols[5][1]) - 34 - 5.5, 5.5 + bottom_thickness]) rotate([90, 0, 90]) cylinder(wt, 5.5, 5.5);
 		}
-		translate([xpos - 21 - wt, (key_space * cols[5][1]) + cols[5][0] - 34, bottom_thickness])
+		translate([xpos - 21 - wt, (key_space * cols[5][1]) - 34, bottom_thickness])
 			cube([2, 34, 1]);
 		for(i = [0:len(screwpos) - 1])
 			translate([screwpos[i][0], screwpos[i][1], bottom_thickness])
@@ -172,11 +172,11 @@ module shape(h, padding, part = 0)
 		if(part == 0)
 			translate([xpos + padding - wt, (((padding != wt) && (part == 0)) ? (cos(thumbkeyrot[2]) * (key_space + wt + wt)) : 0) + ypos, ((padding != wt) && (part == 0)) ? - plate_thickness - plate_thickness : 0])
 				rotate(90)
-					cube([-ypos + cols[5][0] + (key_space * cols[5][1]) + padding - (((padding != wt) && (part == 0)) ? (cos(thumbkeyrot[2]) * (key_space + wt + wt)) : 0), xpos - (key_space * 6) - wt - wt + padding, h]);
+					cube([-ypos + (key_space * cols[5][1]) + padding - (((padding != wt) && (part == 0)) ? (cos(thumbkeyrot[2]) * (key_space + wt + wt)) : 0), xpos - (key_space * 6) - wt - wt + padding, h]);
 		else
 			translate([xpos + padding - wt, ypos, ((padding != wt) && (part == 0)) ? - plate_thickness - plate_thickness : 0])
 				rotate(90)
-					cube([-ypos + cols[5][0] + (key_space * cols[5][1]) + padding, xpos - (key_space * 6) - wt + padding, h]);
+					cube([-ypos + (key_space * cols[5][1]) + padding, xpos - (key_space * 6) - wt + padding, h]);
 	}
 }
 
