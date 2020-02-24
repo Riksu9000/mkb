@@ -2,24 +2,6 @@ include <../../lib/screwpost.scad>
 include <../../lib/switch.scad>
 include <../../lib/dsacaps.scad>
 
-/*
-up 4.75
-up 2.375
-down 2.375
-down 2.375
-
-center thumb down from middle finger 22mm
-center thumb right from middle finger 9.5mm
-
-next thumb rotation 15deg
-next thumb right 21mm
-next thumb down 2.75mm
-
-last thumb rotation 60deg
-last thumb right 22.25mm
-last thumb down 3.75mm
-*/
-
 // Larger values can be used for aesthetic reasons.
 wall_thickness = 1.75;
 
@@ -42,7 +24,6 @@ shellh = max(9 - plate_thickness, promicroclearance);
 
 // Thickness of shell is wt, while minimum thickness of walls around switches are wall_thickness
 wt = max(2, wall_thickness + key_clearance);
-
 
 rscrew = 1.5;
 rtop   = 3;
@@ -76,9 +57,11 @@ screwpos = [
 	[key_space * 5, key_space * 2 + (cols[4][0] + cols[5][0]) / 2],
 ];
 
-p = $preview ? -0.1 : 0;
+p = $preview ? 0.1 : 0;
 
 key_space = 19;
+
+xpos = thumbkeys[2][0] + (key_space / 2) + cos(thumbkeyrot[2]) * ((key_space * (thumbkeysize[2] / 2)) + wt) + sin(thumbkeyrot[2]) * ((key_space / 2) + wt);
 
 module plate()
 {
@@ -90,12 +73,12 @@ module plate()
 		for(x = [0:len(cols) - 1])
 		{
 			for(y = [0:cols[x][1] - 1])
-				translate([key_space * x, (key_space * y) + cols[x][0], p])
-					switch(plate_thickness + ($preview ? 1: 0));
+				translate([key_space * x, (key_space * y) + cols[x][0]])
+					switch(plate_thickness + p);
 		}
 		for(i = [0:len(thumbkeys) - 1])
 			translate(thumbkeys[i])
-				switch(plate_thickness + ($preview ? 1: 0), rotation = thumbkeyrot[i]);
+				switch(plate_thickness + p, rotation = thumbkeyrot[i]);
 		// Micro USB
 		translate([xpos - wt - 9.5 - 7, (key_space * cols[5][1]) + 1, 0.75 - 3 - shellh]) cube([14, wt, 10]);
 
@@ -106,9 +89,9 @@ module plate()
 		// Screw holes
 		for(i = [0:len(screwpos) - 1]) translate(screwpos[i])
 		{
-			cylinder(plate_thickness + ($preview ? 1: 0), rscrew, rscrew);
+			cylinder(plate_thickness + p, rscrew, rscrew);
 			translate([0, 0, plate_thickness])
-				cylinder(wallh + ($preview ? 1: 0), rtop, rtop);
+				cylinder(wallh + p, rtop, rtop);
 		}
 	}
 }
@@ -137,14 +120,6 @@ module shell()
 				screwpost(shellh);
 	}
 }
-
-// Pro micro holder test
-xpos = thumbkeys[2][0] + (key_space / 2) + cos(thumbkeyrot[2]) * ((key_space * (thumbkeysize[2] / 2)) + wt) + sin(thumbkeyrot[2]) * ((key_space / 2) + wt);
-//translate([xpos - 21 - wt, (key_space * cols[5][1]) + cols[5][0] - 34, 3])
-//{
-//	cube([2, 34, 1]);
-//	translate([2 + 19, 0]) cube([2, 34, 1]);
-//}
 
 module shape(h, padding, part = 0)
 {
