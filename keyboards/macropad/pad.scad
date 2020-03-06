@@ -5,7 +5,6 @@ deckmode = 0;  // [0:Disabled, 1:Enabled]
 
 // Only in deckmode
 holder_angle = 30;
-
 angle = deckmode ? holder_angle : 0;
 
 width = 5; // [3:20]
@@ -16,10 +15,15 @@ wall_thickness = 1.75;
 
 $fn = 24; // [8:8.Draft, 24:24.Proto, 72:72.Export]
 
+hbevel = 0; // [0:10]
+
+wallh = 7; // [0:15]
+
 /* [Hidden] */
 
+MAXBEVEL = 10;
+
 bottom_thickness = 1;
-wallh = 7;
 
 // Extra clearance between keycaps and walls
 key_clearance = 0.25;
@@ -86,8 +90,12 @@ module shell()
 	center = (width / 2) * key_space;
 	difference()
 	{
-		translate([0, 0, -bottom_thickness]) shape(shellh + bottom_thickness);
-		cube([key_space * width, key_space * height, shellh + ($preview ? 1 : 0)]);
+		union()
+		{
+			translate([0, 0, -bottom_thickness]) shape(shellh + bottom_thickness, wt, hbevel);
+			translate([center - 11.5, (height * key_space) - MAXBEVEL, -bottom_thickness]) cube([23, wt + MAXBEVEL, MAXBEVEL + bottom_thickness]);
+		}
+		shape(shellh + bottom_thickness, 0, hbevel);
 
 		if(deckmode)
 			translate([0, 0, shellh])
@@ -100,9 +108,12 @@ module shell()
 		translate([center - 4, height * key_space, 0.75]) cube([8, wt, 4]);
 		translate([center - 8, (height * key_space) + 1, 0.75 - 4]) cube([16, wt, 12]);
 
-		translate([(width / 2) * key_space, 0, -0.2])
-			linear_extrude(0.2)
-				text("github.com/Riksu9000/mkb", halign="center", valign="bottom", size=min(width, 6));
+		// Flatten when using hbevel
+		translate([center - 9.5, height * key_space]) rotate(-90) cube([MAXBEVEL, 19, MAXBEVEL]);
+
+		translate([(width / 2) * key_space, hbevel, -0.2])
+			linear_extrude(0.2 + ($preview ? 1 : 0))
+				text("github.com/Riksu9000/mkb", halign="center", valign="bottom", size=min(width - ((hbevel * 2) / (width * key_space)), 6));
 	}
 
 	difference()
@@ -126,7 +137,8 @@ module stand()
 {
 	dist = key_space * (height - 1);
 	thickness = 3;
-	r = r_axle - 0.3;
+	peg_depth = 2;
+	r = r_axle - 0.15;
 	height = sqrt((shellh + bottom_thickness) * (shellh + bottom_thickness) + ((key_space / 2) + wt) * ((key_space / 2) + wt)) + 1;
 
 	//https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/undersized_circular_objects
@@ -140,7 +152,7 @@ module stand()
 		}
 	}
 
-	module peg(h = thickness, r = r)
+	module peg(h = peg_depth, r = r)
 	{
 		intersection()
 		{
@@ -148,7 +160,7 @@ module stand()
 			hull()
 			{
 				rotate([0, -90]) cylinder(1, r, r);
-				translate([h, 0, h]) rotate([0, 90]) cylinder(1, r, r);
+				translate([h, 0, h]) rotate([0, -90]) cylinder(1, r, r);
 			}
 		}
 	}
@@ -186,7 +198,7 @@ module stand()
 	translate([-wt, (key_space * 0.5) - height, -height + shellh]) cylinder_outer((width * key_space) + (2 * wt), r, 8);
 }
 
-module shape(h, r = wt)
+module shape(h, r = wt, hbevel = 0)
 {
 	shellshape = [
 		[0, 0],
@@ -196,9 +208,23 @@ module shape(h, r = wt)
 	];
 
 	hull()
-		for(i = [0:len(shellshape) - 1])
-			translate(shellshape[i])
-				cylinder(h, r, r);
+	{
+		if(r == 0)
+		{
+			translate([hbevel, hbevel]) cube([(width * key_space) - (hbevel * 2), (height * key_space) - (hbevel * 2), hbevel]);
+			translate([0, 0, hbevel]) cube([width * key_space, height * key_space, h - hbevel]);
+		}
+		else
+		{
+			for(i = [0:len(shellshape) - 1])
+			{
+				translate([shellshape[i][0], shellshape[i][1], hbevel])
+					cylinder(h - hbevel, r, r);
+				translate([shellshape[i][0] ? shellshape[i][0] - hbevel: hbevel, shellshape[i][1] ? shellshape[i][1] - hbevel: hbevel])
+					cylinder(h, r, r);
+			}
+		}
+	}
 }
 
 translate([0, key_space * 0.5, shellh]) rotate([angle, 0]) translate([0, -key_space * 0.5, -shellh])
