@@ -22,8 +22,7 @@ module switch(h = plate_thickness, shape = "complex", rotation = 0)
 							translate([-0.8, 1])              cube([SIDE + 1.6, 3.5, h]);
 							translate([-0.8, SIDE - 1 - 3.5]) cube([SIDE + 1.6, 3.5, h]);
 						}
-						translate([(SIDE / 2) - (TAB_WIDTH / 2), -TAB_DEPTH]) cube([TAB_WIDTH, TAB_DEPTH, h - TAB_HEIGHT]);
-						translate([(SIDE / 2) - (TAB_WIDTH / 2), SIDE])       cube([TAB_WIDTH, TAB_DEPTH, h - TAB_HEIGHT]);
+						translate([(SIDE / 2) - (TAB_WIDTH / 2), -TAB_DEPTH]) cube([TAB_WIDTH, TAB_DEPTH + SIDE + TAB_DEPTH, h - TAB_HEIGHT]);
 					}
 }
 
