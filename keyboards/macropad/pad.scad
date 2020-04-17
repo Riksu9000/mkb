@@ -1,5 +1,6 @@
 include <../../lib/switch.scad>
 include <../../lib/screwpost.scad>
+include <../../lib/dsacaps.scad>
 
 deckmode = 0;  // [0:Disabled, 1:Enabled]
 
@@ -21,6 +22,8 @@ wallh = 7; // [0:15]
 compact = 0;  // [0:Disabled, 1:Enabled]
 
 /* [Preview] */
+
+previewcaps = 0; // [0:False,1:True]
 
 fn = 24; // [8:8.Draft, 24:24.Proto, 72:72.Export]
 $fn = $preview ? fn : 72;
@@ -83,7 +86,8 @@ module plate()
 				cube([(key_space * width) + (key_clearance * 2), (key_space * height) + (key_clearance * 2), wallh + p]);
 
 		for(x = [0:width - 1], y = [0:height - 1])
-			translate([key_space * x, key_space * y, -p]) switch(plate_thickness + p+p);
+			translate([key_space * x, key_space * y, -p])
+				switch(plate_thickness + p+p);
 	
 		for(i = [0:len(screwpos) - 1]) translate(screwpos[i])
 			cylinder(plate_thickness + p, rscrew, rscrew);
@@ -247,6 +251,11 @@ translate([0, key_space * 0.5, shellh]) rotate([angle, 0]) translate([0, -key_sp
 	shell();
 }
 if(deckmode) stand();
+
+if(previewcaps)
+	for(x = [0:width - 1], y = [0:height - 1])
+		translate([key_space * x, key_space * y, shellh + plate_thickness + 7])
+			dsacap();
 
 //stand();
 //translate([0, 0, shellh]) plate();
