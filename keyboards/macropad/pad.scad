@@ -13,8 +13,6 @@ height = 3; // [3:20]
 // Larger values can be used for aesthetic reasons
 wall_thickness = 1.75;
 
-$fn = 24; // [8:8.Draft, 24:24.Proto, 72:72.Export]
-
 hbevel = 0; // [0:10]
 
 wallh = 7; // [0:15]
@@ -22,7 +20,14 @@ wallh = 7; // [0:15]
 // Experimental option when wallh=0 to make the device 3.4mm smaller...
 compact = 0;  // [0:Disabled, 1:Enabled]
 
+/* [Preview] */
+
+fn = 24; // [8:8.Draft, 24:24.Proto, 72:72.Export]
+$fn = $preview ? fn : 72;
+
 /* [Hidden] */
+
+p = $preview ? 0.1 : 0;
 
 // Only allow shrinking when requirements are met
 shrink = (wallh == 0) && compact ? (key_space - 15.6) / 2 : 0;
@@ -73,14 +78,15 @@ module plate()
 	difference()
 	{
 		shape(plate_thickness + wallh);
-		translate([-key_clearance, -key_clearance, plate_thickness])
-			cube([(key_space * width) + (key_clearance * 2), (key_space * height) + (key_clearance * 2), wallh + ($preview ? 1 : 0)]);
+		if(wallh > 0)
+			translate([-key_clearance, -key_clearance, plate_thickness])
+				cube([(key_space * width) + (key_clearance * 2), (key_space * height) + (key_clearance * 2), wallh + p]);
 
 		for(x = [0:width - 1], y = [0:height - 1])
-			translate([key_space * x, key_space * y, ($preview ? -.1 : 0)]) switch(plate_thickness + ($preview ? 1 : 0));
+			translate([key_space * x, key_space * y, -p]) switch(plate_thickness + p+p);
 	
 		for(i = [0:len(screwpos) - 1]) translate(screwpos[i])
-			cylinder(plate_thickness + ($preview ? 1 : 0), rscrew, rscrew);
+			cylinder(plate_thickness + p, rscrew, rscrew);
 
 		if(deckmode)
 			for(i = [0:len(pegpos) - 1])
@@ -111,14 +117,14 @@ module shell()
 							cylinder(wt - 1.75, r_axle, r_axle);
 
 		// Micro USB-port
-		translate([center - 4, (height * key_space) - shrink, 0.75]) cube([8, wt, 4]);
+		translate([center - 4, (height * key_space) - shrink - p, 0.75]) cube([8, wt, 4]);
 		translate([center - 8, (height * key_space) + 1 - shrink, 0.75 - 4]) cube([16, wt, 12]);
 
 		// Flatten when using hbevel
 		translate([center - 9.5, (height * key_space) - shrink]) rotate(-90) cube([MAXBEVEL, 19, MAXBEVEL]);
 
 		translate([(width / 2) * key_space, hbevel + shrink, -0.2])
-			linear_extrude(0.2 + ($preview ? 1 : 0), convexity = 10)
+			linear_extrude(0.2 + p, convexity = 10)
 				text("github.com/Riksu9000/mkb", halign="center", valign="bottom", size=min(width - ((hbevel * 2) / (width * key_space)), 6));
 	}
 
