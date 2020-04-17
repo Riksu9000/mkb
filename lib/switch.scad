@@ -8,7 +8,7 @@ module switch(h = plate_thickness, shape = "complex", rotation = 0)
 {
 	SIDE = 14;
 	TAB_HEIGHT = 1.5;
-	TAB_DEPTH = 1;
+	TAB_DEPTH = 0.8;
 	TAB_WIDTH = 5;
 	translate([key_space / 2, key_space / 2])
 		rotate(rotation)
@@ -17,10 +17,11 @@ module switch(h = plate_thickness, shape = "complex", rotation = 0)
 					union()
 					{
 						cube([SIDE, SIDE, h]);
+						// TODO: complex shape uses TAB_DEPTH for now. They may need to be separated.
 						if(shape == "complex")
 						{
-							translate([-0.8, 1])              cube([SIDE + 1.6, 3.5, h]);
-							translate([-0.8, SIDE - 1 - 3.5]) cube([SIDE + 1.6, 3.5, h]);
+							translate([-TAB_DEPTH, 1])              cube([SIDE + (TAB_DEPTH * 2), 3.5, h]);
+							translate([-TAB_DEPTH, SIDE - 1 - 3.5]) cube([SIDE + (TAB_DEPTH * 2), 3.5, h]);
 						}
 						translate([(SIDE / 2) - (TAB_WIDTH / 2), -TAB_DEPTH]) cube([TAB_WIDTH, TAB_DEPTH + SIDE + TAB_DEPTH, h - TAB_HEIGHT]);
 					}
