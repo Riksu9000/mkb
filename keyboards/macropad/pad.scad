@@ -19,7 +19,13 @@ hbevel = 0; // [0:10]
 
 wallh = 7; // [0:15]
 
+// Experimental option when wallh=0 to make the device 3.4mm smaller...
+compact = 0;  // [0:Disabled, 1:Enabled]
+
 /* [Hidden] */
+
+// Only allow shrinking when requirements are met
+shrink = (wallh == 0) && compact ? (key_space - 15.6) / 2 : 0;
 
 MAXBEVEL = 10;
 
@@ -93,7 +99,7 @@ module shell()
 		union()
 		{
 			translate([0, 0, -bottom_thickness]) shape(shellh + bottom_thickness, wt, hbevel);
-			translate([center - 11.5, (height * key_space) - MAXBEVEL, -bottom_thickness]) cube([23, wt + MAXBEVEL, MAXBEVEL + bottom_thickness]);
+			translate([center - 11.5, (height * key_space) - MAXBEVEL - shrink, -bottom_thickness]) cube([23, wt + MAXBEVEL, MAXBEVEL + bottom_thickness]);
 		}
 		shape(shellh + bottom_thickness, 0, hbevel);
 
@@ -105,14 +111,14 @@ module shell()
 							cylinder(wt - 1.75, r_axle, r_axle);
 
 		// Micro USB-port
-		translate([center - 4, height * key_space, 0.75]) cube([8, wt, 4]);
-		translate([center - 8, (height * key_space) + 1, 0.75 - 4]) cube([16, wt, 12]);
+		translate([center - 4, (height * key_space) - shrink, 0.75]) cube([8, wt, 4]);
+		translate([center - 8, (height * key_space) + 1 - shrink, 0.75 - 4]) cube([16, wt, 12]);
 
 		// Flatten when using hbevel
-		translate([center - 9.5, height * key_space]) rotate(-90) cube([MAXBEVEL, 19, MAXBEVEL]);
+		translate([center - 9.5, (height * key_space) - shrink]) rotate(-90) cube([MAXBEVEL, 19, MAXBEVEL]);
 
-		translate([(width / 2) * key_space, hbevel, -0.2])
-			linear_extrude(0.2 + ($preview ? 1 : 0))
+		translate([(width / 2) * key_space, hbevel + shrink, -0.2])
+			linear_extrude(0.2 + ($preview ? 1 : 0), convexity = 10)
 				text("github.com/Riksu9000/mkb", halign="center", valign="bottom", size=min(width - ((hbevel * 2) / (width * key_space)), 6));
 	}
 
@@ -201,18 +207,20 @@ module stand()
 module shape(h, r = wt, hbevel = 0)
 {
 	shellshape = [
-		[0, 0],
-		[0, height * key_space],
-		[width * key_space, height * key_space],
-		[width * key_space, 0],
+		[shrink, shrink],
+		[shrink, (height * key_space) - shrink],
+		[(width * key_space) - shrink, (height * key_space) - shrink],
+		[(width * key_space) - shrink, shrink],
 	];
 
 	hull()
 	{
 		if(r == 0)
 		{
-			translate([hbevel, hbevel]) cube([(width * key_space) - (hbevel * 2), (height * key_space) - (hbevel * 2), hbevel]);
-			translate([0, 0, hbevel]) cube([width * key_space, height * key_space, h - hbevel]);
+			translate([hbevel + shrink, hbevel + shrink])
+				cube([(width * key_space) - (hbevel * 2) - (shrink * 2), (height * key_space) - (hbevel * 2) - (shrink * 2), hbevel]);
+			translate([shrink, shrink, hbevel])
+				cube([(width * key_space) - (shrink * 2), (height * key_space) - (shrink * 2), h - hbevel]);
 		}
 		else
 		{
@@ -220,8 +228,8 @@ module shape(h, r = wt, hbevel = 0)
 			{
 				translate([shellshape[i][0], shellshape[i][1], hbevel])
 					cylinder(h - hbevel, r, r);
-				translate([shellshape[i][0] ? shellshape[i][0] - hbevel: hbevel, shellshape[i][1] ? shellshape[i][1] - hbevel: hbevel])
-					cylinder(h, r, r);
+				translate([shellshape[i][0] + (shellshape[i][0] == shrink ? hbevel : -hbevel), shellshape[i][1] + (shellshape[i][1] == shrink ? hbevel : -hbevel)])
+					cylinder(hbevel, r, r);
 			}
 		}
 	}
