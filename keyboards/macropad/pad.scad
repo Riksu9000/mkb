@@ -245,18 +245,18 @@ module shape(h, r = wt, hbevel = 0)
 	}
 }
 
-translate([0, key_space * 0.5, shellh]) rotate([angle, 0]) translate([0, -key_space * 0.5, -shellh])
-{
-	translate([0, 0, shellh]) plate();
-	shell();
-}
-if(deckmode) stand();
+translate([0, key_space * 0.5, shellh])
+	rotate([angle, 0])
+		translate([0, -key_space * 0.5, -shellh])
+		{
+			translate([0, 0, shellh]) plate();
+			shell();
+			if(previewcaps)
+				for(x = [0:width - 1], y = [0:height - 1])
+					translate([key_space * x, key_space * y, shellh + plate_thickness + 7])
+						dsacap();
+		}
 
-if(previewcaps)
-	for(x = [0:width - 1], y = [0:height - 1])
-		translate([key_space * x, key_space * y, shellh + plate_thickness + 7])
-			dsacap();
+if(deckmode)
+	stand();
 
-//stand();
-//translate([0, 0, shellh]) plate();
-//shell();
