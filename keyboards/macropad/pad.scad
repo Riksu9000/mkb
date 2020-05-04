@@ -2,7 +2,7 @@ include <../../lib/switch.scad>
 include <../../lib/screwpost.scad>
 include <../../lib/dsacaps.scad>
 
-deckmode = 0;  // [0:Disabled, 1:Enabled]
+deckmode = false;
 
 // Only in deckmode
 holder_angle = 30;
@@ -19,11 +19,11 @@ hbevel = 0; // [0:10]
 wallh = 7; // [0:15]
 
 // Experimental option when wallh=0 to make the device 3.4mm smaller...
-compact = 0;  // [0:Disabled, 1:Enabled]
+compact = false;
 
 /* [Preview] */
 
-previewcaps = 0; // [0:False,1:True]
+previewcaps = false;
 
 fn = 24; // [8:8.Draft, 24:24.Proto, 72:72.Export]
 $fn = $preview ? fn : 72;

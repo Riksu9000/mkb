@@ -7,7 +7,7 @@ include <../../lib/dsacaps.scad>
 fn = 24; // [8:8.Draft, 24:24.Proto, 72:72.Export]
 $fn = $preview ? fn : 72;
 
-previewcaps = 0; // [0:False,1:True]
+previewcaps = false;
 
 /* [Hidden] */
 
