@@ -128,29 +128,33 @@ module shape(h, padding, part = 0)
 
 	union()
 	{
-		for(i = [0:len(cols) - 1])
-			translate([(i * key_space) - padding, cols[i][0] - padding])
-				cube([key_space + padding + padding, (cols[i][1] * key_space) + padding + padding, h]);
-		translate([(key_space / 2), (key_space / 2), h / 2])
-			for(i = [0:len(thumbkeys) - 1])
-				translate(thumbkeys[i])
-					rotate(thumbkeyrot[i])
-						/*
-						 * TODO: Conditionals below are dirty hacks
-						 */
-						translate([(i != 2 ? .2 : 0) * key_space, key_space * 0.2])
-							cube([((i != 2 ? 1.4 : 1.0) * key_space * thumbkeysize[i]) + padding + padding, (key_space * 1.4) + padding + padding, h], center=true);
-		/*
-		 * TODO: if statement below is a dirty hack
-		 */
-		if(part == 0)
-			translate([xpos + padding - wt, (((padding != wt) && (part == 0)) ? (cos(thumbkeyrot[2]) * (key_space + wt + wt)) : 0) + ypos, ((padding != wt) && (part == 0)) ? - plate_thickness - plate_thickness : 0])
-				rotate(90)
-					cube([-ypos + (key_space * cols[5][1]) + padding - (((padding != wt) && (part == 0)) ? (cos(thumbkeyrot[2]) * (key_space + wt + wt)) : 0), xpos - (key_space * 6) - wt - wt + padding, h]);
+		/* Using offset causes a small side effect where the small cavity in the
+		 * middle is lost.
+		 * The delta value of 3 gave the best results */
+		linear_extrude(h, convexity = 10)
+			offset(delta = -3)
+				offset(delta =  3 + padding)
+					projection()
+					{
+						for(i = [0:len(cols) - 1])
+							translate([(i * key_space), cols[i][0]])
+								cube([key_space, (cols[i][1] * key_space), h]);
+						translate([(key_space / 2), (key_space / 2), h / 2])
+							for(i = [0:len(thumbkeys) - 1])
+								translate(thumbkeys[i])
+									rotate(thumbkeyrot[i])
+										cube([(key_space * thumbkeysize[i]), key_space, h], center=true);
+					}
+		// TODO: remove rotation
+		if(padding > key_clearance)
+			translate([(key_space * 6) + wt, ypos])
+				cube([xpos - (key_space * 6) - wt - wt + padding, -ypos + (key_space * cols[5][1]) + padding, h]);
+		else if(part == 0)
+			translate([(key_space * 6) + wt, (cos(thumbkeyrot[2]) * (key_space + wt + wt)) + ypos, -plate_thickness * 2])
+				cube([xpos - (key_space * 6) - wt - wt + padding, -ypos + (key_space * cols[5][1]) + padding - (cos(thumbkeyrot[2]) * (key_space + wt + wt)), h]);
 		else
-			translate([xpos + padding - wt, ypos, ((padding != wt) && (part == 0)) ? - plate_thickness - plate_thickness : 0])
-				rotate(90)
-					cube([-ypos + (key_space * cols[5][1]) + padding, xpos - (key_space * 6) - wt + padding, h]);
+			translate([key_space * 6, ypos])
+				cube([xpos - (key_space * 6) - wt + padding, -ypos + (key_space * cols[5][1]) + padding, h]);
 	}
 }
 
