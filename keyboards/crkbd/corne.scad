@@ -145,7 +145,6 @@ module shape(h, padding, part = 0)
 									rotate(thumbkeyrot[i])
 										cube([(key_space * thumbkeysize[i]), key_space, h], center=true);
 					}
-		// TODO: remove rotation
 		if(padding > key_clearance)
 			translate([(key_space * 6) + wt, ypos])
 				cube([xpos - (key_space * 6) - wt - wt + padding, -ypos + (key_space * cols[5][1]) + padding, h]);
