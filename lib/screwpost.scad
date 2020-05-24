@@ -8,7 +8,7 @@ module screwpost(h = shellh, rtop = rtop, rscrew = rscrew)
 			translate([0, 0, h - 2]) cylinder(2, rtop, rtop);
 			cylinder(h - 2, rtop + wall_thickness, rtop);
 		}
-		cylinder(h, rscrew, rscrew);
+		cylinder(h + 0.01, rscrew, rscrew);
 	}
 }
 
