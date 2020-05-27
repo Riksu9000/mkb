@@ -12,9 +12,3 @@ module screwpost(h = shellh, rtop = rtop, rscrew = rscrew)
 	}
 }
 
-// This can be used to hollow out the post if necessary
-module screwhole(h = shellh, rscrew = rscrew)
-{
-	cylinder(h, rscrew, rscrew);
-}
-
