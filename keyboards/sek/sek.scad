@@ -4,6 +4,8 @@ include <../../lib/dsacaps.scad>
 
 clean_sides = true;
 
+ctrl_width = 1.25;  //[1.0, 1.25, 1.5, 1.75, 2.0]
+
 /* [Preview] */
 
 previewcaps = false;
@@ -54,7 +56,12 @@ height = cols[tallestcol][0] + key_space * cols[tallestcol][1];
 nthumbkeys = 4;
 
 screwpos = [
-	[key_space, key_space + cols[0][0]],
+	if(ctrl_width == 1)
+		[key_space, key_space + cols[0][0]],
+	if(ctrl_width == 1.25)
+		[(key_space * 1.25), (key_space / 2) + cols[0][0]],
+	if(ctrl_width == 1.5 || ctrl_width == 1.75 || ctrl_width == 2.0)
+		[rtop, cols[0][0] + rtop],
 	[key_space, (key_space * cols[0][1]) + cols[0][0]],
 	[width - key_space, key_space * (cols[len(cols) - 2][1] - 1)],
 	[width - cos(thumb_angle) * key_space , -sin(thumb_angle) * key_space],
@@ -80,6 +87,7 @@ module plate()
 {
 	difference()
 	{
+		ctrl_offset = (key_space * ctrl_width - key_space) / 2;
 		// Base pieces
 		shellshape(plate_thickness + wallh, wt);
 
@@ -87,7 +95,7 @@ module plate()
 		for(x = [0:len(cols) - 1])
 		{
 			for(y = [0:cols[x][1] - 1])
-				translate([key_space * x, (key_space * y) + cols[x][0], -p])
+				translate([key_space * x + (x == 0 && y == 0 ? ctrl_offset : 0), (key_space * y) + cols[x][0], -p])
 					switch(plate_thickness + p*2, corner = "round");
 			if(wallh > 0)
 			{
@@ -96,6 +104,9 @@ module plate()
 					cube([key_space + (key_clearance * 2), key_space * cols[x][1] + (key_clearance * 2) + thumbcleaner, wallh + p]);
 			}
 		}
+		if(ctrl_width > 1)
+			translate([-key_clearance, cols[0][0] - key_clearance, plate_thickness])
+				cube([(key_space * ctrl_width) + (key_clearance * 2), key_space + (key_clearance * 2), wallh + p]);
 
 		// Thumb keys
 		translate([width, -thumb_offset - sin(thumb_angle) * key_space])
@@ -238,7 +249,7 @@ module shellshape(h, r, hbevel = 0)
 	// Points go around counter clockwise starting from bottom left point
 	points = [
 		[0, cols[0][0]],
-		[key_space, cols[0][0]],
+		[key_space * ctrl_width, cols[0][0]],
 
 		[width - sin(thumb_angle) * key_space - cos(thumb_angle) * key_space * nthumbkeys,
 		- thumb_offset // Top left corner
@@ -274,15 +285,19 @@ plate();
 
 // Show keycaps in preview mode
 %if(previewcaps)
-{
-	%dsacaps();
 	%color("#222")
+	{
+		ctrl_offset = (key_space * ctrl_width - key_space) / 2;
+		for(x = [0:len(cols) - 1])
+			for(y = [0:cols[x][1] - 1])
+				translate([key_space * x + (x == 0 && y == 0 ? ctrl_offset : 0), (key_space * y) + cols[x][0], plate_thickness + 7])
+					dsacap(unit = (x == 0 && y == 0 ? ctrl_width : 1));
 		translate([width, -thumb_offset - sin(thumb_angle) * key_space])
 			rotate(180 - thumb_angle)
 				for(i = [0:nthumbkeys - 1])
 					translate([key_space * i, 0, plate_thickness + 7])
 						dsacap();
-}
+	}
 
 //translate([0, 0, -shellh - bottom_thickness])
 //	difference()
