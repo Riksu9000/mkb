@@ -96,7 +96,7 @@ module plate()
 		{
 			for(y = [0:cols[x][1] - 1])
 				translate([key_space * x + (x == 0 && y == 0 ? ctrl_offset : 0), (key_space * y) + cols[x][0], -p])
-					switch(plate_thickness + p*2, corner = "round");
+					switch(plate_thickness + p*2);
 			if(wallh > 0)
 			{
 				thumbcleaner = clean_sides && x > len(cols) - nthumbkeys - 1 && x < len(cols) - 1 ? 4 : 0;
@@ -115,7 +115,7 @@ module plate()
 					translate([key_space * i, 0])
 					{
 						translate([0, 0, -p])
-							switch(plate_thickness + p*2, corner = "round");
+							switch(plate_thickness + p*2);
 						if(wallh > 0)
 							translate([-key_clearance, -key_clearance, plate_thickness])
 								cube([key_space + (key_clearance * 2), key_space + (key_clearance * 2), wallh + p*2]);
