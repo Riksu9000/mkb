@@ -177,7 +177,23 @@ module shell()
 				// Leave a part inside that holds TRRS jack
 				translate([width - (key_space / 2) - 6.5, height - (((key_space * 2.5) + 5.5) * tan(top_angle)) + (wt / cos(top_angle)) - 3.5 - 1.5])
 					cube([6.5 + (key_space / 2), wt * 8, shellh]);
+
+				// Connect screwpost to side wall
+				if(ctrl_width >= 1.5)
+					hull()
+					{
+						translate([0, cols[0][0] + rtop])
+							screwpost();
+						translate([rtop, cols[0][0] + rtop])
+							screwpost();
+						translate([rtop, cols[0][0]])
+							screwpost();
+					}
 			}
+
+			if(ctrl_width >= 1.5)
+				translate([rtop, cols[0][0] + rtop])
+					cylinder(shellh + p, r = rscrew);
 
 			// Hole for switch
 			translate([center, height - key_space, -bottom_thickness])
