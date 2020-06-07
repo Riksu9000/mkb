@@ -126,8 +126,8 @@ module plate()
 			translate(screwpos[i])
 			{
 				cylinder(plate_thickness + p, r = rscrew + 0.05);
-				translate([0, 0, plate_thickness])
-					cylinder(wallh + p, r = rtop);
+				translate([0, 0, 2])
+					cylinder(plate_thickness - 2 + wallh + p, r = rtop);
 			}
 
 		// Part revision
