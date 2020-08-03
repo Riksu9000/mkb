@@ -212,12 +212,8 @@ module shell()
 			// Micro usb hole
 			translate([width / 4, height - key_space * 1.25 * tan(top_angle)])
 				rotate(top_angle)
-				{
 					translate([-4, -0.01, 1.75])
 						cube([8, wt + 0.01, 3]);
-					translate([-8, 1.5, 1.75 - 4])
-						cube([16, wt, 11]);
-				}
 		}
 
 		// Mount for reset switch
@@ -233,9 +229,9 @@ module shell()
 		translate([width / 4, height - key_space * 1.25 * tan(top_angle)])
 			rotate(-90 + top_angle)
 			{
-				translate([0, 9.5])
+				translate([0, 9.25])
 					cube([34, 2, 1]);
-				translate([0, -11.5])
+				translate([0, -11.25])
 					cube([34, 2, 1]);
 			}
 
