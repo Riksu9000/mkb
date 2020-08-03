@@ -12,9 +12,6 @@ previewcaps = false;
 
 /* [Hidden] */
 
-plate_rev = "R2";
-shell_rev = "R2";
-
 wallh = 7;
 
 bottom_thickness = 1;
@@ -129,12 +126,6 @@ module plate()
 				translate([0, 0, 2])
 					cylinder(plate_thickness - 2 + wallh + p, r = rtop);
 			}
-
-		// Part revision
-		translate([key_space * 1.5, -key_space / 2])
-			linear_extrude(layer_height + p, convexity = 10)
-				rotate([0, 180])
-					text(shell_rev, halign="center", valign="center", size=6);
 	}
 }
 
@@ -216,12 +207,7 @@ module shell()
 
 			translate([center, 12, -0.2])
 				linear_extrude(layer_height + p, convexity = 10)
-					text("https://github.com/Riksu9000/mkb", halign="center", valign="center", size=6);
-
-			// Part revision
-			translate([center, 0, -0.2])
-				linear_extrude(layer_height + p, convexity = 10)
-					text(shell_rev, halign="center", valign="center", size=6);
+					text("github.com/Riksu9000/mkb", halign="center", valign="center", size=6);
 
 			// Micro usb hole
 			translate([width / 4, height - key_space * 1.25 * tan(top_angle)])
