@@ -121,8 +121,10 @@ module shell()
 							cylinder(wt - 1.75, r_axle, r_axle);
 
 		// Micro USB-port
-		translate([center - 4, (height * key_space) - shrink - p, 0.75]) cube([8, wt, 4]);
-		translate([center - 8, (height * key_space) + 1 - shrink, 0.75 - 4]) cube([16, wt, 12]);
+		translate([center - 4, (height * key_space) - shrink - p, 1.75])
+			cube([8, wt + 1, 3]);
+		translate([center - 8, (height * key_space) + 2 - shrink, 0.75 - 4])
+			cube([16, wt, 12]);
 
 		// Flatten when using hbevel
 		translate([center - 9.5, (height * key_space) - shrink]) rotate(-90) cube([MAXBEVEL, 19, MAXBEVEL]);
@@ -145,8 +147,10 @@ module shell()
 	}
 
 	// Pro micro holder
-	translate([center - 11.5, (height * key_space) - 34]) cube([2, 34, 1]);
-	translate([center + 9.5, (height * key_space) - 34]) cube([2, 34, 1]);
+	translate([center - 11.25, (height * key_space) - 34])
+		cube([2, 34, 1]);
+	translate([center + 9.25, (height * key_space) - 34])
+		cube([2, 34, 1]);
 }
 
 module stand()
