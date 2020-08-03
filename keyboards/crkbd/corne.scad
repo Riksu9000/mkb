@@ -80,10 +80,6 @@ module plate()
 			translate([thumbkeys[i][0], thumbkeys[i][1], -p])
 				switch(plate_thickness + p+p, rotation = thumbkeyrot[i]);
 
-		// Micro USB
-		translate([xpos - wt - 9.5 - 7, (key_space * cols[5][1]) + 1, 0.75 - 3 - shellh])
-			cube([14, wt, 10]);
-
 		// TRRS jack hole
 		translate([xpos - wt - 19, (key_space * cols[5][1]) - 34 - 5.5, 5.5 - shellh]) rotate([90, 0, 90]) cylinder(wt + 19, 4, 4);
 		translate([xpos - wt + 1,  (key_space * cols[5][1]) - 34 - 5.5, 5.5 - shellh]) rotate([90, 0, 90]) cylinder(wt, 5.5, 5.5);
@@ -106,8 +102,7 @@ module shell()
 				shape(shellh + p, 0, 1);
 
 			// Micro USB
-			translate([xpos - wt - 9.5 - 4, (key_space * cols[5][1]), bottom_thickness + 0.75]) cube([8, wt, 4]);
-			translate([xpos - wt - 9.5 - 7, (key_space * cols[5][1]) + 1, bottom_thickness + 0.75 - 3]) cube([14, wt, 10]);
+			translate([xpos - wt - 9.5 - 4, (key_space * cols[5][1]), bottom_thickness + 1.75]) cube([8, wt, 3]);
 
 			// TRRS jack hole
 			translate([xpos - wt,     (key_space * cols[5][1]) - 34 - 5.5, 5.5 + bottom_thickness]) rotate([90, 0, 90]) cylinder(wt, 4, 4);
