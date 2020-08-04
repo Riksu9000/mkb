@@ -5,7 +5,7 @@ include <../../lib/dsacaps.scad>
 // Larger values can be used for aesthetic reasons
 wall_thickness = 1.75;
 
-$fn = 24; // [8:8.Draft, 24:24.Proto, 72:72.Export]
+$fn = $preview ? 24 : 72;
 
 hbevel = 0; // [0:10]
 

@@ -4,8 +4,7 @@ include <../../lib/dsacaps.scad>
 
 /* [Preview] */
 
-fn = 24; // [8:8.Draft, 24:24.Proto, 72:72.Export]
-$fn = $preview ? fn : 72;
+$fn = $preview ? 24 : 72;
 
 previewcaps = false;
 
