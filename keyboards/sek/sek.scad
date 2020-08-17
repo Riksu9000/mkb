@@ -1,6 +1,8 @@
 include <../../lib/screwpost.scad>
 include <../../lib/switch.scad>
 include <../../lib/dsacaps.scad>
+$fn = $preview ? 24 : 72;
+p = $preview ? 0.1 : 0;
 
 clean_sides = true;
 
@@ -10,7 +12,7 @@ ctrl_width = 1.25;  //[1.0, 1.25, 1.5, 1.75, 2.0]
 
 previewcaps = false;
 
-/* [Hidden] */
+/* [Experimental] */
 
 wallh = 7;
 
@@ -32,6 +34,12 @@ wt = max(2, wall_thickness + key_clearance);
 rscrew = 1.45;
 rtop   = 3;
 
+nthumbkeys = 4;
+
+layer_height = 0.25;
+
+/* [Hidden] */
+
 cols = [
 	[-key_space, 4],
 	[0, 4],
@@ -50,8 +58,6 @@ width  = 7 * key_space;
 center = width / 2;
 height = cols[tallestcol][0] + key_space * cols[tallestcol][1];
 
-nthumbkeys = 4;
-
 screwpos = [
 	if(ctrl_width == 1)
 		[key_space, key_space + cols[0][0]],
@@ -65,13 +71,6 @@ screwpos = [
 ];
 
 top_angle = atan((cols[3][0] - cols[1][0]) / (key_space * 2));
-
-// Currently only used for colorize
-layer_height = 0.25;
-
-p = $preview ? 0.1 : 0;
-
-$fn = $preview ? 24 : 72;
 
 // https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/undersized_circular_objects
 module cylinder_outer(h, r, fn){
@@ -274,22 +273,14 @@ module shellshape(h, r, hbevel = 0)
 		}
 }
 
-// Output
-
-translate([0, 0, -shellh - 0.001]) shell();
-plate();
-//translate([0, 0, plate_thickness - (layer_height * 2) + p])
-//	colorize();
-
 // Show keycaps in preview mode
 %if(previewcaps)
 	%color("#222")
 	{
 		ctrl_offset = (key_space * ctrl_width - key_space) / 2;
-		for(x = [0:len(cols) - 1])
-			for(y = [0:cols[x][1] - 1])
-				translate([key_space * x + (x == 0 && y == 0 ? ctrl_offset : 0), (key_space * y) + cols[x][0], plate_thickness + 7])
-					dsacap(unit = (x == 0 && y == 0 ? ctrl_width : 1));
+		for(x = [0:len(cols) - 1], y = [0:cols[x][1] - 1])
+			translate([key_space * x + (x == 0 && y == 0 ? ctrl_offset : 0), (key_space * y) + cols[x][0], plate_thickness + 7])
+				dsacap(unit = (x == 0 && y == 0 ? ctrl_width : 1));
 		translate([width, -thumb_offset - sin(thumb_angle) * key_space])
 			rotate(180 - thumb_angle)
 				for(i = [0:nthumbkeys - 1])
@@ -297,10 +288,10 @@ plate();
 						dsacap();
 	}
 
-//translate([0, 0, -shellh - bottom_thickness])
-//	difference()
-//	{
-//		translate([-wt, -100])
-//			cube([width + wt + wt - (sin(top_angle) * key_space), 100, shellh + plate_thickness]);
-//		shellshape(shellh + plate_thickness, wt + 0.1);
-//	}
+/* Output */
+
+translate([0, 0, -shellh -0.1]) shell();
+plate();
+
+/* Experimental */
+//translate([0, 0, plate_thickness - (layer_height * 2) + p]) colorize();
