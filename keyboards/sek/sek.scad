@@ -14,7 +14,7 @@ previewcaps = false;
 
 wallh = 7;
 
-bottom_thickness = 1;
+bottom_thickness = 1.25;
 
 // Extra clearance between keycaps and walls
 key_clearance = 0.25;
@@ -192,7 +192,7 @@ module shell()
 
 			// Reset text
 			translate([center, height - key_space + 4, -bottom_thickness -p])
-				linear_extrude(layer_height, convexity = 10)
+				linear_extrude(layer_height * 2, convexity = 10)
 					rotate([0, 180])
 						text("Reset", halign="center", valign="bottom", size=4);
 
@@ -205,8 +205,8 @@ module shell()
 						cylinder(4.5 + 0.01, r = 4);
 				}
 
-			translate([center, 12, -0.2])
-				linear_extrude(layer_height + p, convexity = 10)
+			translate([center, 12, -layer_height * 2])
+				linear_extrude(layer_height * 2 + p, convexity = 10)
 					text("github.com/Riksu9000/mkb", halign="center", valign="center", size=6);
 
 			// Micro usb hole
