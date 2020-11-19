@@ -1,9 +1,5 @@
-include <../../lib/screwpost.scad>
 include <../../lib/switch.scad>
 include <../../lib/dsacaps.scad>
-$fn = $preview ? 24 : 72;
-p = $preview ? 0.1 : 0;
-
 clean_sides = true;
 
 ctrl_width = 1.25;  //[1.0, 1.25, 1.5, 1.75, 2.0]
@@ -40,6 +36,10 @@ layer_height = 0.25;
 
 /* [Hidden] */
 
+$fa = 5;
+$fs = .3; // PrusaSlicer seems to combine lines when smaller than this
+p = $preview ? 0.1 : 0;
+
 cols = [
 	[-key_space, 4],
 	[0, 4],
@@ -59,15 +59,15 @@ center = width / 2;
 height = cols[tallestcol][0] + key_space * cols[tallestcol][1];
 
 screwpos = [
+	[key_space, (key_space * cols[0][1]) + cols[0][0]],
+	[width - key_space, key_space * (cols[len(cols) - 2][1] - 1)],
+	[width - cos(thumb_angle) * key_space , -sin(thumb_angle) * key_space],
 	if(ctrl_width == 1)
 		[key_space, key_space + cols[0][0]],
 	if(ctrl_width == 1.25)
 		[(key_space * 1.25), (key_space / 2) + cols[0][0]],
 	if(ctrl_width == 1.5 || ctrl_width == 1.75 || ctrl_width == 2.0)
 		[rtop, cols[0][0] + rtop],
-	[key_space, (key_space * cols[0][1]) + cols[0][0]],
-	[width - key_space, key_space * (cols[len(cols) - 2][1] - 1)],
-	[width - cos(thumb_angle) * key_space , -sin(thumb_angle) * key_space],
 ];
 
 top_angle = atan((cols[3][0] - cols[1][0]) / (key_space * 2));
@@ -78,6 +78,21 @@ module cylinder_outer(h, r, fn){
 	rotate(180 / fn)
 	cylinder(h, r = r * fudge, $fn = fn);
 }
+
+module screwpost()
+{
+	difference()
+	{
+		union()
+		{
+			translate([0, 0, shellh - 9 + plate_thickness])
+				cylinder(9 - plate_thickness, r = rtop);
+			cylinder(shellh - 9 + plate_thickness, r1 = rtop + wt, r2 = rtop);
+		}
+		cylinder(shellh +p, r = rscrew);
+	}
+}
+//!screwpost();
 
 module plate()
 {
@@ -127,29 +142,7 @@ module plate()
 			}
 	}
 }
-
-// Experimental way of coloring the underside of keys
-module colorize()
-{
-	difference()
-	{
-		linear_extrude(layer_height * 2)
-			offset(r = -10 - (wt / 2))
-				offset(r = 10)
-					projection()
-						plate();
-		for(x = [0:len(cols) - 1])
-			for(y = [0:cols[x][1] - 1])
-				translate([key_space * x, (key_space * y) + cols[x][0], -p])
-					switch(plate_thickness + p*2);
-		// Thumb keys
-		translate([width, -thumb_offset - sin(thumb_angle) * key_space])
-			rotate(180 - thumb_angle)
-				for(i = [0:nthumbkeys - 1])
-					translate([key_space * i, 0, -p])
-							switch(plate_thickness + p*2);
-	}
-}
+//!plate();
 
 module shell()
 {
@@ -165,25 +158,9 @@ module shell()
 			{
 				shellshape(shellh + p, 0);
 				// Leave a part inside that holds TRRS jack
-				translate([width - (key_space / 2) - 6.5, height - (((key_space * 2.5) + 5.5) * tan(top_angle)) + (wt / cos(top_angle)) - 3.5 - 1.5])
-					cube([6.5 + (key_space / 2), wt * 8, shellh]);
-
-				// Connect screwpost to side wall
-				if(ctrl_width >= 1.5)
-					hull()
-					{
-						translate([0, cols[0][0] + rtop])
-							screwpost();
-						translate([rtop, cols[0][0] + rtop])
-							screwpost();
-						translate([rtop, cols[0][0]])
-							screwpost();
-					}
+				translate([width - (key_space / 2) - 5.4 - wt, height - (((key_space * 2.5) + 5.5) * tan(top_angle)) + (wt / cos(top_angle)) - 3.5 - 1.5])
+					cube([wt + 5.4 + (key_space / 2), wt * 8, shellh]);
 			}
-
-			if(ctrl_width >= 1.5)
-				translate([rtop, cols[0][0] + rtop])
-					cylinder(shellh + p, r = rscrew);
 
 			// Hole for switch
 			translate([center, height - key_space, -bottom_thickness])
@@ -199,14 +176,10 @@ module shell()
 			translate([width - (key_space / 2), height - (((key_space * 2.5) + 5.5) * tan(top_angle)) + (wt / cos(top_angle)) - 3.5, 4.5])
 				rotate([-90, 0])
 				{
-					cylinder_outer(wt * 8, 5.5, $fn);  // cylinder_outer only to fix non-manifold error
+					cylinder(wt * 8, r = 5.4);
 					translate([0, 0, -1.51])
 						cylinder(4.5 + 0.01, r = 4);
 				}
-
-			translate([center, 12, -layer_height * 2])
-				linear_extrude(layer_height * 2 + p, convexity = 10)
-					text("github.com/Riksu9000/mkb", halign="center", valign="center", size=6);
 
 			// Micro usb hole
 			translate([width / 4, height - key_space * 1.25 * tan(top_angle)])
@@ -235,11 +208,32 @@ module shell()
 			}
 
 		// Screw posts
-		for(i = [0:len(screwpos) - 1])
+		for(i = [0:len(screwpos) - 2])
 			translate(screwpos[i])
-				screwpost(shellh);
+				screwpost();
+		// bottom left corner screwmount
+		if(ctrl_width >= 1.5)
+			linear_extrude(shellh)
+				difference()
+				{
+					union()
+					{
+						translate([rtop, cols[0][0] + rtop])
+							circle(rtop);
+						translate([0, cols[0][0]])
+							square([rtop, rtop * 2]);
+						translate([0, cols[0][0]])
+							square([rtop * 2, rtop]);
+					}
+					translate([rtop, cols[0][0] + rtop])
+						circle(rscrew);
+				}
+		else
+			translate(screwpos[len(screwpos) - 1])
+				screwpost();
 	}
 }
+//!shell();
 
 module shellshape(h, r, hbevel = 0)
 {
@@ -265,13 +259,10 @@ module shellshape(h, r, hbevel = 0)
 	];
 
 	linear_extrude(h, convexity = 4)
-		minkowski()
-		{
+		offset(r)
 			polygon(points);
-			if(r > 0)
-				circle(r);
-		}
 }
+//!shellshape(1, 0);
 
 // Show keycaps in preview mode
 %if(previewcaps)
@@ -290,8 +281,29 @@ module shellshape(h, r, hbevel = 0)
 
 /* Output */
 
-translate([0, 0, -shellh -0.1]) shell();
-plate();
+if($preview)
+{
+	translate([0, 0, -shellh -0.1])
+		shell();
+	plate();
+}
+else
+{
+	for(i = [0, 1])
+	{
+		mirror([i, 0, 0])
+			translate([-width - wt - 0.5, 0])
+				plate();
+		translate([0, 105])
+			difference()
+			{
+				mirror([i, 0, 0])
+					translate([-width - wt - 0.5, 0])
+						shell();
+				translate([-width - wt - 0.5 + center + i * (width + wt * 2 + 1), 12, -layer_height * 2])
+					linear_extrude(layer_height * 2)
+						text("github.com/Riksu9000/mkb", halign="center", valign="center", size=6);
+			}
+	}
+}
 
-/* Experimental */
-//translate([0, 0, plate_thickness - (layer_height * 2) + p]) colorize();
