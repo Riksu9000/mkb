@@ -294,7 +294,7 @@ else
 		mirror([i, 0, 0])
 			translate([-width - wt - 0.5, 0])
 				plate();
-		translate([0, 105])
+		translate([0, 105, bottom_thickness])
 			difference()
 			{
 				mirror([i, 0, 0])
