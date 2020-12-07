@@ -14,6 +14,11 @@ wallh = 7;
 
 bottom_thickness = 1.25;
 
+chamfer_top = false;
+
+top_chamfer = 1;
+bottom_chamfer = 1;
+
 // Extra clearance between keycaps and walls
 key_clearance = 0.25;
 
@@ -100,7 +105,14 @@ module plate()
 	{
 		ctrl_offset = (key_space * ctrl_width - key_space) / 2;
 		// Base pieces
-		shellshape(plate_thickness + wallh, wt);
+		if(chamfer_top)
+			minkowski()
+			{
+				shellshape(plate_thickness + wallh - top_chamfer, 0);
+				cylinder(top_chamfer, r1 = wt, r2 = wt - top_chamfer);
+			}
+		else
+			shellshape(plate_thickness + wallh, wt);
 
 		// switch holes and space for caps
 		for(x = [0:len(cols) - 1])
@@ -152,7 +164,11 @@ module shell()
 		{
 			// Main shell
 			translate([0, 0, -bottom_thickness])
-				shellshape(shellh + bottom_thickness, wt);
+				minkowski()
+				{
+					shellshape(shellh + bottom_thickness - bottom_chamfer, 0);
+					cylinder(bottom_chamfer, r1 = wt - bottom_chamfer, r2 = wt);
+				}
 
 			difference()
 			{
@@ -235,7 +251,7 @@ module shell()
 }
 //!shell();
 
-module shellshape(h, r, hbevel = 0)
+module shellshape(h, r)
 {
 	// Points go around counter clockwise starting from bottom left point
 	points = [
@@ -307,3 +323,4 @@ else
 	}
 }
 
+echo(str("Screw length:", 4, "-", shellh + 2, "mm"));
