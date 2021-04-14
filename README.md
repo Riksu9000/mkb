@@ -1,6 +1,6 @@
 # mkb
 
-![sek keyboard](/resources/sek_top.png)
+![sek keyboard](resources/sek_top.png)
 
 This repository holds designs and libs for 3D-printed and handwired keyboards.
 

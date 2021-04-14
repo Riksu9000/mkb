@@ -1,5 +1,6 @@
 include <../../lib/switch.scad>
 include <../../lib/dsacaps.scad>
+
 clean_sides = true;
 
 ctrl_width = 1.25;  //[1.0, 1.25, 1.5, 1.75, 2.0]
@@ -30,6 +31,8 @@ shellh = 9 - plate_thickness + promicroclearance;
  * are wall_thickness
  */
 wall_thickness = 1.75;
+wd = key_clearance;
+wr = wall_thickness;
 wt = max(2, wall_thickness + key_clearance);
 
 rscrew = 1.45;
@@ -108,11 +111,16 @@ module plate()
 		if(chamfer_top)
 			minkowski()
 			{
-				shellshape(plate_thickness + wallh - top_chamfer, 0);
-				cylinder(top_chamfer, r1 = wt, r2 = wt - top_chamfer);
+				linear_extrude(plate_thickness + wallh - top_chamfer)
+					offset(delta = wd)
+						shellshape();
+				cylinder(top_chamfer, r1 = wr, r2 = wr - top_chamfer);
 			}
 		else
-			shellshape(plate_thickness + wallh, wt);
+			linear_extrude(plate_thickness + wallh)
+				offset(wr)
+					offset(delta = wd)
+						shellshape();
 
 		// switch holes and space for caps
 		for(x = [0:len(cols) - 1])
@@ -166,16 +174,21 @@ module shell()
 			translate([0, 0, -bottom_thickness])
 				minkowski()
 				{
-					shellshape(shellh + bottom_thickness - bottom_chamfer, 0);
-					cylinder(bottom_chamfer, r1 = wt - bottom_chamfer, r2 = wt);
+					linear_extrude(shellh + bottom_thickness - bottom_chamfer)
+						offset(delta = wd)
+							shellshape();
+					cylinder(bottom_chamfer, r1 = wr - bottom_chamfer, r2 = wr);
 				}
 
 			difference()
 			{
-				shellshape(shellh + p, 0);
+				linear_extrude(shellh + p)
+					shellshape();
 				// Leave a part inside that holds TRRS jack
-				translate([width - (key_space / 2) - 5.4 - wt, height - (((key_space * 2.5) + 5.5) * tan(top_angle)) + (wt / cos(top_angle)) - 3.5 - 1.5])
-					cube([wt + 5.4 + (key_space / 2), wt * 8, shellh]);
+				translate([width, height - (key_space * 3 * tan(top_angle))])
+					rotate([0, 0, -top_angle])
+						translate([-10.8 - wt, -3.5])
+							cube([10.8 + wt * 2, 3.5, shellh]);
 			}
 
 			// Hole for switch
@@ -189,13 +202,14 @@ module shell()
 						text("Reset", halign="center", valign="bottom", size=4);
 
 			// TRRS jack hole
-			translate([width - (key_space / 2), height - (((key_space * 2.5) + 5.5) * tan(top_angle)) + (wt / cos(top_angle)) - 3.5, 4.5])
-				rotate([-90, 0])
-				{
-					cylinder(wt * 8, r = 5.4);
-					translate([0, 0, -1.51])
-						cylinder(4.5 + 0.01, r = 4);
-				}
+			translate([width, height - (key_space * 3 * tan(top_angle)), 4.5])
+				rotate([-90, 0, -top_angle])
+					translate([-5.4, 0, wt - 3.5])
+					{
+						cylinder(wt * 8, r = 5.4);
+						translate([0, 0, -wt - 0.01])
+							cylinder(wt * 2, r = 4);
+					}
 
 			// Micro usb hole
 			translate([width / 4, height - key_space * 1.25 * tan(top_angle)])
@@ -208,9 +222,15 @@ module shell()
 		translate([center, height - key_space])
 			difference()
 			{
-				cylinder(3, (3 * sqrt(2)) + 1.5, 3 * sqrt(2));
-				translate([-3, -6])
-					cube([6, 12, 3 + p]);
+				hull()
+				{
+					translate([-3 - wt, -3])
+						cube([6 + wt * 2, 6, 3]);
+					translate([-3 - wt - 3, -3, -bottom_thickness])
+						cube([6 + wt * 2 + 6, 6, bottom_thickness]);
+				}
+				translate([-3, -6, -bottom_thickness])
+					cube([6, 12, bottom_thickness + 3 +p]);
 			}
 
 		// Pro micro holder
@@ -251,7 +271,7 @@ module shell()
 }
 //!shell();
 
-module shellshape(h, r)
+module shellshape()
 {
 	// Points go around counter clockwise starting from bottom left point
 	points = [
@@ -274,11 +294,9 @@ module shellshape(h, r)
 		[0,      height - (key_space * 3   * tan(top_angle))],
 	];
 
-	linear_extrude(h, convexity = 4)
-		offset(r)
-			polygon(points);
+	polygon(points);
 }
-//!shellshape(1, 0);
+//!shellshape();
 
 // Show keycaps in preview mode
 %if(previewcaps)
